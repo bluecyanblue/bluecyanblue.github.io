@@ -116,9 +116,9 @@ timer_video.srcObject = timer_canvas_stream;
 const noise_generation_context = new AudioContext();
 noise_generation_context.suspend();
 noise_muted = true;
-const white_noise_generation_buffer = noise_generation_context.createBuffer(1, 30 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
-const pink_noise_generation_buffer = noise_generation_context.createBuffer(1, 30 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
-const brown_noise_generation_buffer = noise_generation_context.createBuffer(1, 30 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+const white_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+const pink_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+const brown_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
 {
 	// noise
 	const white_channel = white_noise_generation_buffer.getChannelData(0);
@@ -132,7 +132,7 @@ const brown_noise_generation_buffer = noise_generation_context.createBuffer(1, 3
 	// browning variable
 	var brown_0 = 0.0;
 	
-	for(let i = 0; i < 2 * noise_generation_context.sampleRate; i++) {
+	for(let i = 0; i < 10 * noise_generation_context.sampleRate; i++) {
 		white_channel[i] = 2 * Math.random() - 1;
 		
 		pink_0 = 0.99886 * pink_0 + white_channel[i] * 0.0555179;
