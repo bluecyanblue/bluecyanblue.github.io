@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>-</title>
+		<link rel="stylesheet" href="style.css">
+		<script defer src="main.js"></script>
+	</head>
+	<body>
+		<nav><h1 style="display: inline">⌛ TickTock</h1> <sup>*(working title) **(legally distinct from TikTok)</sup></nav>
+		<div id="content-wrapper">
+			<div id="timer-wrapper">
+				<svg id="timer-svg" version="1.1" width="600" height="675" xmlns="http://www.w3.org/2000/svg">
+
+					<rect class="timer-bg" width="100%" height="100%" fill="white" />
+
+					<circle class="timer-outer" cx="300" cy="375" r="250" fill="#222" />
+					<circle class="timer-inner" cx="300" cy="375" r="200" fill="#888" />
+
+					<rect class="timer-outer" x="275" y="75" width="50" height="75" fill="#222"/>
+					<rect class="timer-outer" x="225" y="50" width="150" height="50" rx="25" ry="25" fill="#222"/>
+
+					<path id ="timer-circle" d="M 300 175 A 200 200 0 1 1 300 175" stroke="white" fill="transparent" stroke-width="50"/>
+
+					<text id="timer-text" x="300" y="375" text-anchor="middle" dominant-baseline="middle" font-family="Bahnschrift, Arial Black, sans-serif" font-size="30" font-weight="bold" fill="white">-</text>
+				</svg>
+			</div>
+			<div id="options-wrapper">
+				<div id="timer-options">
+					<div id="timer-duration-controls"></div>
+					<button id="timer-button">Start</button>
+					<!-- pause, stop, next, reset should also be here probably -->
+					<button id="timer-pip-button">Toggle Picture-in-Picture</button>
+				</div>
+				<div id="white-noise-options">
+					<button class="dropdown-reveal dropdown-is-hidden">Noise</button>
+					<button id="white-noise-button">White noise</button>
+					<button id="pink-noise-button">Pink noise</button>
+					<button id="brown-noise-button">Brown noise</button>
+				</div>
+				<div id="binaural-options">
+					<button class="dropdown-reveal dropdown-is-hidden">Binaural beats</button>
+					<label class="block-option">
+						Base frequency (pitch):<br />
+						<label>
+							50 Hz
+							<input type="range" id="binaural-base-freq" min="50" max="500" />
+							500 Hz
+						</label>
+					</label>
+					<label class="block-option">
+						Difference:<br />
+						<label>
+							0 Hz
+							<input type="range" id="binaural-diff-range" min="0" max="100" />
+							100 Hz
+						</label>
+					</label>
+					<button id="binaural-beats-button" class="block-option">generate binaural beats</button>
+				</div>
+				<button id="stop-noise-button">Mute</button>
+				
+			</div>
+		</div>
+	</body>
+</html>

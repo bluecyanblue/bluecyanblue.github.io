@@ -1,0 +1,81 @@
+body {
+	margin: 0;
+	font-family: Bahnschrift, "Trebuchet MS", sans-serif;
+}
+body * {
+	font-family: inherit;
+}
+@media (min-aspect-ratio: 4/3) {
+	body {
+		display: flex;
+		flex-direction: column;
+		height: 100vh;
+	}
+	#content-wrapper {
+		flex-grow: 1;
+		overflow: hidden;
+		display: flex;
+		flex-direction: row;
+		justify-content: safe center;
+	}
+	#options-wrapper {
+		min-width: 33vw;
+	}
+}
+nav {
+	border-bottom: 0.125rem solid #888;
+	padding: 1rem;
+	margin-bottom: 2rem;
+}
+#white-noise-options, #binaural-options {
+	border-radius: 0.5rem;
+	margin: 0.25rem;
+	overflow: hidden;
+}
+.block-option {
+	display: block;
+	width: 100%;
+}
+.dropdown-reveal {
+	appearance: none;
+	display: block;
+	width: 100%;
+	text-align: left;
+	outline: none;
+	border: none;
+	padding: 0.5rem;
+	border-radius: 0.5rem;
+}
+.dropdown-is-hidden ~ * {
+	display: none;
+}
+#stop-noise-button {
+	display: block;
+	width: 100%;
+	position: relative;
+}
+#stop-noise-button::after {
+	content: url(./mute.svg);
+	position: absolute;
+	right: 0;
+}
+#timer-duration-controls {
+	display: flex;
+	flex-direction: row;
+}
+#timer-duration-controls * {
+	flex-grow: 1;
+	align-self: stretch;
+}
+#timer-duration-controls * button {
+	display: block;
+	width: 100%;
+	appearance: none;
+	outline: none;
+	background: none;
+	border: none;
+}
+#timer-duration-controls * p {
+	text-align: center;
+	margin: 0.5rem 0;
+}
