@@ -116,9 +116,9 @@ timer_video.srcObject = timer_canvas_stream;
 const noise_generation_context = new AudioContext();
 noise_generation_context.suspend();
 noise_muted = true;
-const white_noise_generation_buffer = noise_generation_context.createBuffer(1, 2 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
-const pink_noise_generation_buffer = noise_generation_context.createBuffer(1, 2 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
-const brown_noise_generation_buffer = noise_generation_context.createBuffer(1, 2 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+const white_noise_generation_buffer = noise_generation_context.createBuffer(1, 30 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+const pink_noise_generation_buffer = noise_generation_context.createBuffer(1, 30 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+const brown_noise_generation_buffer = noise_generation_context.createBuffer(1, 30 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
 {
 	// noise
 	const white_channel = white_noise_generation_buffer.getChannelData(0);
