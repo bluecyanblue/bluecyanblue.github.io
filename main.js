@@ -1,5 +1,3 @@
-// the timer button is broken kind of
-// also add a nice interface to set the timer
 function util_s_to_hmmss(s) {
 	let seconds = s % 60;
 	s -= seconds;
@@ -15,7 +13,7 @@ function start_timer() {
 	paused = false;
 	timer_started = true;
 	work_timer = !work_timer;
-	seconds = work_timer ? set_seconds : 300; // make adjustable
+	seconds = work_timer ? work_timer_set_seconds : break_timer_set_seconds;
 	timer_ms = 0;
 	if(work_timer) {
 		const timer_outer = document.getElementsByClassName('timer-outer');
@@ -39,27 +37,28 @@ function start_timer() {
 	}
 	requestAnimationFrame((timestamp) => prev_timestamp = timestamp);
 	requestAnimationFrame(update_timer);
-	to_canvas_img.addEventListener('load', () => {
-		timer_canvas_ctx.drawImage(to_canvas_img, 0, 0);
-	});
 	timer_video.play();
 	timer_video.requestPictureInPicture(); // wrap in try-catch
 	navigator.mediaSession.setActionHandler('play', () => {
 		toggle_pause(false);
+		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
 		if(!noise_muted) noise_generation_context.resume();
 	});
 	navigator.mediaSession.setActionHandler('pause', () => {
 		toggle_pause(true);
+		timer_button.classList.add('timer-button-paused');
 		timer_video.pause();
 		noise_generation_context.suspend();
 	});
 	navigator.mediaSession.setActionHandler('previoustrack', () => {
 		timer_ms = 0;
 		if(paused) toggle_pause(false);
+		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
 	});
 	navigator.mediaSession.setActionHandler('nexttrack', () => {
+		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
 		start_timer();
 	});
@@ -234,9 +233,10 @@ const brown_noise_generation_buffer = noise_generation_context.createBuffer(1, 1
 	
 }
 
-var set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused;
+var break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused;
 work_timer = false; // for alternating between work/break blocks
-set_seconds = 25 * 60; // default
+work_timer_set_seconds = 25 * 60; // default
+break_timer_set_seconds = 5 * 60; // default
 const to_canvas_img = document.createElement('img');
 const to_canvas_serializer = new XMLSerializer();
 const timer_svg = document.getElementById('timer-svg');
@@ -245,49 +245,81 @@ const timer_circle = document.getElementById('timer-circle');
 const timer_text = document.getElementById('timer-text');
 
 {
+	const work_break_switch = document.getElementById('timer-work-break-switch');
 	const controls_container = document.getElementById('timer-duration-controls');
 	const hours_minutes_seconds_display = {hours: document.createElement('p'), minutes: document.createElement('p'), seconds: document.createElement('p')};
+	function update_hours_minutes_seconds_display(units_vals) {
+		hours_minutes_seconds_display.seconds.textContent = units_vals[0];
+		hours_minutes_seconds_display.minutes.textContent = units_vals[1];
+		hours_minutes_seconds_display.hours.textContent = units_vals.length == 3 ? units_vals[2] : '0';
+	}
 	hours_minutes_seconds_display.hours.textContent = '0';
 	hours_minutes_seconds_display.minutes.textContent = '25';
 	hours_minutes_seconds_display.seconds.textContent = '00';
+	let selected_work_timer = true; // select work/break
+	
+	const switch_work_timer = document.createElement('button');
+	const switch_break_timer = document.createElement('button');
+	switch_work_timer.addEventListener('click', () => {
+		selected_work_timer = true;
+		switch_work_timer.classList.add('timer-switch-selected');
+		switch_break_timer.classList.remove('timer-switch-selected');
+		update_hours_minutes_seconds_display(util_s_to_hmmss(work_timer_set_seconds).split(':').reverse());
+	});
+	switch_break_timer.addEventListener('click', () => {
+		selected_work_timer = false;
+		switch_break_timer.classList.add('timer-switch-selected');
+		switch_work_timer.classList.remove('timer-switch-selected');
+		update_hours_minutes_seconds_display(util_s_to_hmmss(break_timer_set_seconds).split(':').reverse());
+	});
+	switch_work_timer.classList.add('timer-switch-selected');
+	switch_work_timer.textContent = 'Work';
+	switch_break_timer.textContent = 'Break';
+	work_break_switch.append(switch_work_timer);
+	work_break_switch.append(switch_break_timer);
+	
 	for(let i = 0; i < 3; i++){
 		const unit_division_container = document.createElement('div');
 		const increase_button = document.createElement('button');
 		const decrease_button = document.createElement('button');
-		const increase_icon = document.createElement('img');
-		const decrease_icon = document.createElement('img');
-		increase_icon.src = './triangle_arrow.svg';
-		decrease_icon.src = './triangle_arrow.svg';
-		increase_icon.style.transform = 'scale(1, -1)';
-		increase_button.append(increase_icon);
-		decrease_button.append(decrease_icon);
-		// increase_icon.addEventListener('load', ()=> {
-			// increase_button.height = increase_icon.height;
-		// });
-		// decrease_icon.addEventListener('load', ()=> {
-			// decrease_button.height = decrease_icon.height;
-		// });
-		increase_button.style.height = '12px';
-		decrease_button.style.height = '12px';
-		increase_button.style.padding = '0';
-		decrease_button.style.padding = '0';
+		increase_button.classList.add('time-duration-controls-increase');
+		
 		const factor = 3600 / (60 ** i);
 		increase_button.addEventListener('click', () => {
-			set_seconds += factor;
-			const display_duration = util_s_to_hmmss(set_seconds).split(':').reverse();
-			hours_minutes_seconds_display.seconds.textContent = display_duration[0];
-			hours_minutes_seconds_display.minutes.textContent = display_duration[1];
-			hours_minutes_seconds_display.hours.textContent = display_duration.length == 3 ? display_duration[2] : '0';
+			if(selected_work_timer) {
+				work_timer_set_seconds += factor;
+			} else {
+				break_timer_set_seconds += factor;
+			}
+			update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) > factor) decrease_button.classList.remove('timer-duration-controls-locked');
+		});
+		switch_work_timer.addEventListener('click', () => {
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
+				decrease_button.classList.add('timer-duration-controls-locked');
+			} else {
+				decrease_button.classList.remove('timer-duration-controls-locked');
+			}
 		});
 		decrease_button.addEventListener('click', () => {
-			if(set_seconds <= factor) return;
-			set_seconds -= factor;
-			const display_duration = util_s_to_hmmss(set_seconds).split(':').reverse();
-			hours_minutes_seconds_display.seconds.textContent = display_duration[0];
-			hours_minutes_seconds_display.minutes.textContent = display_duration[1];
-			hours_minutes_seconds_display.hours.textContent = display_duration.length == 3 ? display_duration[2] : '0';
-			if(set_seconds < factor) console.log('oh no'); // color button grey by adding a class (and then corresponding ungrey for increase)
+			if( (selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) return;
+			if(selected_work_timer) {
+				work_timer_set_seconds -= factor;
+			} else {
+				break_timer_set_seconds -= factor;
+			}
+			update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) decrease_button.classList.add('timer-duration-controls-locked');
 		});
+		switch_break_timer.addEventListener('click', () => {
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
+				decrease_button.classList.add('timer-duration-controls-locked');
+			} else {
+				decrease_button.classList.remove('timer-duration-controls-locked');
+			}
+		});
+		if(work_timer_set_seconds <= factor) decrease_button.classList.add('timer-duration-controls-locked');
+		
 		unit_division_container.append(increase_button);
 		switch(i) {
 			case 0:
@@ -304,13 +336,42 @@ const timer_text = document.getElementById('timer-text');
 		controls_container.append(unit_division_container);
 	}
 }
-// still broken lol
-timer_button.addEventListener('click', start_timer, {once: true});
+timer_button.addEventListener('click', () => {
+	start_timer();
+	timer_button.classList.remove('timer-button-paused');
+	timer_button.addEventListener('click', () => {
+		if(paused) {
+			toggle_pause(false);
+			timer_button.classList.remove('timer-button-paused');
+			timer_video.play();
+			if(!noise_muted) noise_generation_context.resume();
+		} else {
+			toggle_pause(true);
+			timer_button.classList.add('timer-button-paused');
+			timer_video.pause();
+			noise_generation_context.suspend();
+		}
+	});
+	document.getElementById('timer-reset-button').addEventListener('click', () => {
+		timer_ms = 0;
+		if(paused) toggle_pause(false);
+		timer_video.play();
+	});
+	document.getElementById('timer-skip-button').addEventListener('click', () => {
+		timer_video.play();
+		start_timer();
+	});
+}, {once: true});
+
+to_canvas_img.addEventListener('load', () => {
+		timer_canvas_ctx.drawImage(to_canvas_img, 0, 0);
+});
 
 document.getElementById('timer-pip-button').addEventListener('click', () => {
 	if(!timer_started) {
 		start_timer();
 	} else {
+		timer_video.play();
 		timer_video.requestPictureInPicture();
 	}
 });

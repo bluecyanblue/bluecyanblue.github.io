@@ -28,40 +28,50 @@
 			</div>
 			<div id="options-wrapper">
 				<div id="timer-options">
-					<div id="timer-duration-controls"></div>
-					<button id="timer-button">Start</button>
-					<!-- pause, stop, next, reset should also be here probably -->
-					<button id="timer-pip-button">Toggle Picture-in-Picture</button>
+					<div>
+						<div id="timer-work-break-switch"></div>
+						<div id="timer-duration-controls"></div>
+					</div>
+					<div id="timer-play-options">
+						<button id="timer-reset-button"></button>
+						<button id="timer-button" class="timer-button-paused"></button>
+						<button id="timer-skip-button"></button>
+						<button id="timer-pip-button"></button>
+					</div>
 				</div>
 				<div id="white-noise-options">
 					<button class="dropdown-reveal dropdown-is-hidden">Noise</button>
-					<button id="white-noise-button">White noise</button>
-					<button id="pink-noise-button">Pink noise</button>
-					<button id="brown-noise-button">Brown noise</button>
+					<div id="white-noise-options-inner">
+						<button id="white-noise-button">White noise</button>
+						<button id="pink-noise-button">Pink noise</button>
+						<button id="brown-noise-button">Brown noise</button>
+					</div>
 				</div>
 				<div id="binaural-options">
 					<button class="dropdown-reveal dropdown-is-hidden">Binaural beats</button>
-					<label class="block-option">
-						Base frequency (pitch):<br />
+					<div id="binaural-frequency-options">
 						<label>
-							50 Hz
-							<input type="range" id="binaural-base-freq" min="50" max="500" />
-							500 Hz
+							Base frequency (pitch):<br />
+							<label>
+								50 Hz
+								<input type="range" id="binaural-base-freq" min="50" max="500" />
+								500 Hz
+							</label>
 						</label>
-					</label>
-					<label class="block-option">
-						Difference:<br />
 						<label>
-							0 Hz
-							<input type="range" id="binaural-diff-range" min="0" max="100" />
-							100 Hz
+							Difference:<br />
+							<label>
+								0 Hz
+								<input type="range" id="binaural-diff-range" min="0" max="100" />
+								100 Hz
+							</label>
 						</label>
-					</label>
-					<button id="binaural-beats-button" class="block-option">generate binaural beats</button>
+					</div>
+					<button id="binaural-beats-button">Generate binaural beats</button>
 				</div>
 				<button id="stop-noise-button">Mute</button>
-				
 			</div>
 		</div>
+		<p style="margin: 0.25rem; clear: both">(P.S.: If you are on mobile, the timer Picture-in-Picture might not work outside your browser; I am looking into fixing the issue using either the Media Session API or the Media Source Extensions API, but cannot make any promises unfortunately)</p>
 	</body>
 </html>

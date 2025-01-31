@@ -1,0 +1,8 @@
+<svg version="1.1" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+	<mask id="outline">
+		<rect width="20px" height="20px" fill="white"/>
+		<rect x="11px" y="11px" width="9px" height="6.5px" fill="transparent" stroke="black" stroke-width="4px" rx="1px"/>
+	</mask>
+	<rect x="1px" y="3.5px" width="18px" height="13px" fill="transparent" stroke="#222" stroke-width="2px" rx="2px" mask="url(#outline)"/>
+	<rect x="11px" y="11px" width="9px" height="6.5px" fill="#222" rx="1px"/>
+</svg>
