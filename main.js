@@ -23,7 +23,6 @@ function start_timer() {
 	requestAnimationFrame((timestamp) => prev_timestamp = timestamp);
 	requestAnimationFrame(update_timer);
 	timer_video.play();
-	// timer_video.requestPictureInPicture();
 	navigator.mediaSession.setActionHandler('play', () => {
 		toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
@@ -60,12 +59,6 @@ function toggle_pause(pause) {
 function update_timer(timestamp) {
 	if(paused) return;
 	if(timer_ms >= seconds * 1000) {
-		// timer_circle.setAttribute('d', 'M 300 175 A 200 200 0 1 1 300 175');
-		// timer_text.textContent = '00:00';
-		// timer_text.setAttribute('font-size', parseInt(timer_text.getAttribute('font-size'), 10) * (250 / timer_text.getComputedTextLength()));
-		// 	let url = to_canvas_serializer.serializeToString(timer_svg);
-		// to_canvas_img.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(url);
-		// timer_button.addEventListener('click', start_timer, {once: true});
 		start_timer();
 		return;
 	}
@@ -97,126 +90,107 @@ const timer_video = document.createElement('video');
 const timer_canvas_stream = timer_canvas.captureStream(30)
 timer_video.srcObject = timer_canvas_stream;
 
-const noise_generation_context = new AudioContext();
-noise_generation_context.suspend();
-noise_muted = true;
-const white_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
-const pink_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
-const brown_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
 {
-	// noise
-	const white_channel = white_noise_generation_buffer.getChannelData(0);
-	const pink_channel = pink_noise_generation_buffer.getChannelData(0);
-	const brown_channel = brown_noise_generation_buffer.getChannelData(0);
-	
-	// pinking variables
-	var pink_0, pink_1, pink_2, pink_3, pink_4, pink_5, pink_6;
-	pink_0 = pink_1 = pink_2 = pink_3 = pink_4 = pink_5 = pink_6 = 0.0;
-	
-	// browning variable
-	var brown_0 = 0.0;
-	
-	for(let i = 0; i < 10 * noise_generation_context.sampleRate; i++) {
-		white_channel[i] = 2 * Math.random() - 1;
-		
-		pink_0 = 0.99886 * pink_0 + white_channel[i] * 0.0555179;
-		pink_1 = 0.99332 * pink_1 + white_channel[i] * 0.0750759;
-		pink_2 = 0.96900 * pink_2 + white_channel[i] * 0.1538520;
-		pink_3 = 0.86650 * pink_3 + white_channel[i] * 0.3104856;
-		pink_4 = 0.55000 * pink_4 + white_channel[i] * 0.5329522;
-		pink_5 = -0.7616 * pink_5 - white_channel[i] * 0.0168980;
-		pink_channel[i] = (pink_0 + pink_1 + pink_2 + pink_3 + pink_4 + pink_5 + pink_6 + (white_channel[i] * 0.5362)) * 0.11;
-		pink_6 = white_channel[i] * 0.115926;
-		
-		brown_channel[i] = (brown_0 + (0.02 * white_channel[i])) / (1.02);
-		brown_0 = brown_channel[i];
-		brown_channel[i] = 3.5 * brown_channel[i];
-		
-	}
-	const white_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
-	const pink_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
-	const brown_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
-	white_noise_generation_buffer_source.buffer = white_noise_generation_buffer;
-	pink_noise_generation_buffer_source.buffer = pink_noise_generation_buffer;
-	brown_noise_generation_buffer_source.buffer = brown_noise_generation_buffer;
-	white_noise_generation_buffer_source.loop = true;
-	pink_noise_generation_buffer_source.loop = true;
-	brown_noise_generation_buffer_source.loop = true;
-	white_noise_generation_buffer_source.start();
-	pink_noise_generation_buffer_source.start();
-	brown_noise_generation_buffer_source.start();
-	
-	// binaural beats
-	const binaural_base_freq = document.getElementById('binaural-base-freq');
-	const oscillator_left = new OscillatorNode(noise_generation_context, {frequency: parseInt(binaural_base_freq.value, 10)});
-	const oscillator_right = new OscillatorNode(noise_generation_context, {frequency: parseInt(binaural_base_freq.value, 10)});
-	const binaural_diff_range = document.getElementById('binaural-diff-range');
-	const binaural_beats_source = new ChannelMergerNode(noise_generation_context, {numberOfInputs: 2});
-	oscillator_left.connect(binaural_beats_source, 0, 0);
-	oscillator_right.connect(binaural_beats_source, 0, 1);
-	oscillator_left.start();
-	oscillator_right.start();
-	
-	document.getElementById('white-noise-button').addEventListener('click', () => {
-		noise_muted = false;
-		
-		white_noise_generation_buffer_source.disconnect();
-		pink_noise_generation_buffer_source.disconnect();
-		brown_noise_generation_buffer_source.disconnect();
-		binaural_beats_source.disconnect();
-		
-		white_noise_generation_buffer_source.connect(noise_generation_context.destination);
-		noise_generation_context.resume();
-	});
-	document.getElementById('pink-noise-button').addEventListener('click', () => {
-		noise_muted = false;
-		
-		white_noise_generation_buffer_source.disconnect();
-		pink_noise_generation_buffer_source.disconnect();
-		brown_noise_generation_buffer_source.disconnect();
-		binaural_beats_source.disconnect();
-		
-		pink_noise_generation_buffer_source.connect(noise_generation_context.destination);
-		noise_generation_context.resume();
-	});
-	document.getElementById('brown-noise-button').addEventListener('click', () => {
-		noise_muted = false;
-		
-		white_noise_generation_buffer_source.disconnect();
-		pink_noise_generation_buffer_source.disconnect();
-		brown_noise_generation_buffer_source.disconnect();
-		binaural_beats_source.disconnect();
-		
-		brown_noise_generation_buffer_source.connect(noise_generation_context.destination);
-		noise_generation_context.resume();
-	});
-	document.getElementById('stop-noise-button').addEventListener('click', () => {
-		noise_muted = true;
+	const noise_buttons = [document.getElementById('white-noise-button'), document.getElementById('pink-noise-button'), document.getElementById('brown-noise-button'), document.getElementById('binaural-beats-button')]
+	function start_noise(e) {
+		const noise_generation_context = new AudioContext();
 		noise_generation_context.suspend();
-	});
-	document.getElementById('binaural-beats-button').addEventListener('click', () => {
-		noise_muted = false;
+		noise_muted = true;
+
+		// noise
+		const white_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+		const pink_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+		const brown_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+
+		const white_channel = white_noise_generation_buffer.getChannelData(0);
+		const pink_channel = pink_noise_generation_buffer.getChannelData(0);
+		const brown_channel = brown_noise_generation_buffer.getChannelData(0);
 		
-		white_noise_generation_buffer_source.disconnect();
-		pink_noise_generation_buffer_source.disconnect();
-		brown_noise_generation_buffer_source.disconnect();
-		binaural_beats_source.disconnect();
+		// pinking variables
+		var pink_0, pink_1, pink_2, pink_3, pink_4, pink_5, pink_6;
+		pink_0 = pink_1 = pink_2 = pink_3 = pink_4 = pink_5 = pink_6 = 0.0;
 		
-		oscillator_left.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) + (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
-		oscillator_right.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) - (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
-		binaural_beats_source.connect(noise_generation_context.destination);
-		noise_generation_context.resume();
-	});
-	binaural_diff_range.addEventListener('change', () => {
-		oscillator_left.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) + (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
-		oscillator_right.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) - (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
-	});
-	binaural_base_freq.addEventListener('change', () => {
-		oscillator_left.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) + (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
-		oscillator_right.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) - (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
-	})
-	
+		// browning variable
+		var brown_0 = 0.0;
+		
+		for(let i = 0; i < 10 * noise_generation_context.sampleRate; i++) {
+			white_channel[i] = 2 * Math.random() - 1;
+			
+			pink_0 = 0.99886 * pink_0 + white_channel[i] * 0.0555179;
+			pink_1 = 0.99332 * pink_1 + white_channel[i] * 0.0750759;
+			pink_2 = 0.96900 * pink_2 + white_channel[i] * 0.1538520;
+			pink_3 = 0.86650 * pink_3 + white_channel[i] * 0.3104856;
+			pink_4 = 0.55000 * pink_4 + white_channel[i] * 0.5329522;
+			pink_5 = -0.7616 * pink_5 - white_channel[i] * 0.0168980;
+			pink_channel[i] = (pink_0 + pink_1 + pink_2 + pink_3 + pink_4 + pink_5 + pink_6 + (white_channel[i] * 0.5362)) * 0.11;
+			pink_6 = white_channel[i] * 0.115926;
+			
+			brown_channel[i] = (brown_0 + (0.02 * white_channel[i])) / (1.02);
+			brown_0 = brown_channel[i];
+			brown_channel[i] = 3.5 * brown_channel[i];
+			
+		}
+		const white_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
+		const pink_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
+		const brown_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
+		white_noise_generation_buffer_source.buffer = white_noise_generation_buffer;
+		pink_noise_generation_buffer_source.buffer = pink_noise_generation_buffer;
+		brown_noise_generation_buffer_source.buffer = brown_noise_generation_buffer;
+		white_noise_generation_buffer_source.loop = true;
+		pink_noise_generation_buffer_source.loop = true;
+		brown_noise_generation_buffer_source.loop = true;
+		white_noise_generation_buffer_source.start();
+		pink_noise_generation_buffer_source.start();
+		brown_noise_generation_buffer_source.start();
+		
+		// binaural beats
+		const binaural_base_freq = document.getElementById('binaural-base-freq');
+		const oscillator_left = new OscillatorNode(noise_generation_context, {frequency: parseInt(binaural_base_freq.value, 10)});
+		const oscillator_right = new OscillatorNode(noise_generation_context, {frequency: parseInt(binaural_base_freq.value, 10)});
+		const binaural_diff_range = document.getElementById('binaural-diff-range');
+		const binaural_beats_source = new ChannelMergerNode(noise_generation_context, {numberOfInputs: 2});
+		oscillator_left.connect(binaural_beats_source, 0, 0);
+		oscillator_right.connect(binaural_beats_source, 0, 1);
+		oscillator_left.start();
+		oscillator_right.start();
+		
+		const audio_source_nodes = [white_noise_generation_buffer_source, pink_noise_generation_buffer_source, brown_noise_generation_buffer_source, binaural_beats_source];
+		function update_oscillator_frequencies() {
+			oscillator_left.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) + (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
+			oscillator_right.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) - (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
+		}
+		function generate_source_playing_function(source) {
+			console.log('yay');
+			console.log(source);
+			return () => {
+				noise_muted = false;
+				for(let i in audio_source_nodes) {
+					audio_source_nodes[i].disconnect();
+				}
+				source.connect(noise_generation_context.destination);
+				noise_generation_context.resume();
+			};
+		}
+		for (let i in noise_buttons) {
+			noise_buttons[i].addEventListener('click', generate_source_playing_function(audio_source_nodes[i]));
+		}
+		document.getElementById('binaural-beats-button').addEventListener('click', () => {update_oscillator_frequencies();})
+		document.getElementById('stop-noise-button').addEventListener('click', () => {
+			noise_muted = true;
+			noise_generation_context.suspend();
+		});
+		binaural_diff_range.addEventListener('change', update_oscillator_frequencies);
+		binaural_base_freq.addEventListener('change', update_oscillator_frequencies);
+		for (let i in noise_buttons) {
+			noise_buttons[i].removeEventListener('click', start_noise);
+		}
+		(generate_source_playing_function(audio_source_nodes[noise_buttons.indexOf(e.target)]))();
+	}
+	for (let i in noise_buttons) {
+		noise_buttons[i].addEventListener('click', start_noise);
+	}
 }
+
 
 var break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused;
 work_timer = false; // for alternating between work/break blocks
@@ -248,17 +222,17 @@ const timer_button = document.getElementById('timer-button');
 	const switch_break_timer = document.createElement('button');
 	switch_work_timer.addEventListener('click', () => {
 		selected_work_timer = true;
-		switch_work_timer.classList.add('timer-switch-selected');
-		switch_break_timer.classList.remove('timer-switch-selected');
+		switch_work_timer.classList.add('button-selected');
+		switch_break_timer.classList.remove('button-selected');
 		update_hours_minutes_seconds_display(util_s_to_hmmss(work_timer_set_seconds).split(':').reverse());
 	});
 	switch_break_timer.addEventListener('click', () => {
 		selected_work_timer = false;
-		switch_break_timer.classList.add('timer-switch-selected');
-		switch_work_timer.classList.remove('timer-switch-selected');
+		switch_break_timer.classList.add('button-selected');
+		switch_work_timer.classList.remove('button-selected');
 		update_hours_minutes_seconds_display(util_s_to_hmmss(break_timer_set_seconds).split(':').reverse());
 	});
-	switch_work_timer.classList.add('timer-switch-selected');
+	switch_work_timer.classList.add('button-selected');
 	switch_work_timer.textContent = 'Work';
 	switch_break_timer.textContent = 'Break';
 	work_break_switch.append(switch_work_timer);
@@ -282,9 +256,9 @@ const timer_button = document.getElementById('timer-button');
 		});
 		switch_work_timer.addEventListener('click', () => {
 			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
-				decrease_button.classList.add('timer-duration-controls-locked');
+				decrease_button.classList.add('button-selected');
 			} else {
-				decrease_button.classList.remove('timer-duration-controls-locked');
+				decrease_button.classList.remove('button-selected');
 			}
 		});
 		decrease_button.addEventListener('click', () => {
@@ -299,12 +273,12 @@ const timer_button = document.getElementById('timer-button');
 		});
 		switch_break_timer.addEventListener('click', () => {
 			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
-				decrease_button.classList.add('timer-duration-controls-locked');
+				decrease_button.classList.add('button-selected');
 			} else {
-				decrease_button.classList.remove('timer-duration-controls-locked');
+				decrease_button.classList.remove('button-selected');
 			}
 		});
-		if(work_timer_set_seconds <= factor) decrease_button.classList.add('timer-duration-controls-locked');
+		if(work_timer_set_seconds <= factor) decrease_button.classList.add('button-selected');
 		
 		unit_division_container.append(increase_button);
 		switch(i) {

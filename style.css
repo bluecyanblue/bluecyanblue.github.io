@@ -10,6 +10,7 @@
 body {
 	margin: 0;
 	font-family: Bahnschrift, "Trebuchet MS", sans-serif;
+	color: var(--accent-color-dark);
 }
 body * {
 	font-family: inherit;
@@ -51,9 +52,8 @@ nav {
 	outline: none;
 	border: none;
 	padding: var(--default-padding);
-	border-bottom: var(--default-margin) solid var(--accent-color-dark);
-	background-color: var(--accent-color-dim);
-	color: white;
+	border-bottom: var(--default-margin) solid var(--accent-color-dim);
+	background-color: var(--accent-color-light);
 	flex-grow: 1;
 }
 #timer-work-break-switch :nth-child(1) {
@@ -62,11 +62,8 @@ nav {
 #timer-work-break-switch :nth-last-child(1) {
 	border-bottom-right-radius: var(--default-border-radius);
 }
-#timer-work-break-switch .timer-switch-selected {
+#timer-work-break-switch .button-selected {
 	flex-grow: 2;
-	background-color: var(--accent-color-light);
-	border-bottom-color: var(--accent-color-dim);
-	color: black;
 }
 #timer-duration-controls {
 	display: flex;
@@ -110,11 +107,7 @@ nav {
 #timer-duration-controls * button.time-duration-controls-increase::after {
 	transform: scale(1, -1);
 }
-#timer-duration-controls * button.timer-duration-controls-locked {
-	background-color: var(--accent-color-dim);
-	border-bottom-color: var(--accent-color-dark);
-}
-#timer-duration-controls * button.timer-duration-controls-locked::after {
+#timer-duration-controls * button.button-selected::after {
 	background-color: var(--accent-color-light);
 }
 #timer-duration-controls * p {
@@ -196,7 +189,7 @@ nav {
 	overflow: hidden;
 }
 #binaural-options {
-	background-color: var(--accent-color-light);
+	background-color: var(--accent-color-light);`
 }
 #white-noise-options-inner {
 	display: flex;
@@ -281,4 +274,9 @@ nav {
 	mask-image: url("graphics/mute.svg");
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
+}
+.button-selected {
+	background-color: var(--accent-color-dim) !important;
+	border-bottom-color: var(--accent-color-dark) !important;
+	color: var(--accent-color-light) !important;
 }
