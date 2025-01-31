@@ -56,6 +56,12 @@ nav {
 	color: white;
 	flex-grow: 1;
 }
+#timer-work-break-switch :nth-child(1) {
+	border-bottom-left-radius: var(--default-border-radius);
+}
+#timer-work-break-switch :nth-last-child(1) {
+	border-bottom-right-radius: var(--default-border-radius);
+}
 #timer-work-break-switch .timer-switch-selected {
 	flex-grow: 2;
 	background-color: var(--accent-color-light);
@@ -85,6 +91,12 @@ nav {
 	padding: var(--default-padding);
 	border-bottom: var(--default-margin) solid var(--accent-color-dim);
 	background-color: var(--accent-color-light);
+}
+#timer-duration-controls :nth-child(1) button:nth-last-child(1) {
+	border-bottom-left-radius: var(--default-border-radius);
+}
+#timer-duration-controls :nth-last-child(1) button:nth-last-child(1) {
+	border-bottom-right-radius: var(--default-border-radius);
 }
 #timer-duration-controls * button::after {
 	display: inline-block;
@@ -182,11 +194,15 @@ nav {
 	border-radius: var(--default-border-radius);
 	margin: var(--default-margin);
 	overflow: hidden;
+}
+#binaural-options {
 	background-color: var(--accent-color-light);
 }
 #white-noise-options-inner {
 	display: flex;
 	flex-direction: row;
+	margin-top: var(--default-margin);
+	gap: var(--default-margin);
 }
 #white-noise-options-inner * {
 	appearance: none;
@@ -195,17 +211,15 @@ nav {
 	outline: none;
 	border: none;
 	padding: 0.25rem 0;
-	border-top: var(--default-margin) solid white;
-	border-left: calc(var(--default-margin) / 2) solid white;
-	border-right: calc(var(--default-margin) / 2) solid white;
+	border-bottom: var(--default-margin) solid var(--accent-color-dim);
 	background-color: var(--accent-color-light);
 	flex-grow: 1;
 }
 #white-noise-options-inner > :nth-child(1) {
-	border-left: none;
+	border-bottom-left-radius: var(--default-border-radius);
 }
 #white-noise-options-inner > :nth-last-child(1) {
-	border-right: none;
+	border-bottom-right-radius: var(--default-border-radius);
 }
 #binaural-frequency-options {
 	padding: var(--default-padding);
@@ -223,6 +237,9 @@ nav {
 	border: none;
 	padding: var(--default-padding);
 	border-top: var(--default-margin) solid white;
+	border-bottom-right-radius: var(--default-border-radius);
+	border-bottom-left-radius: var(--default-border-radius);
+	border-bottom: var(--default-margin) solid var(--accent-color-dim);
 	background-color: var(--accent-color-light);
 }
 .dropdown-reveal {
