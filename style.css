@@ -36,6 +36,79 @@ nav {
 	padding: 1rem;
 	margin-bottom: 2rem;
 }
+#timer-work-break-switch {
+	display: flex;
+	flex-direction: row;
+	gap: var(--default-margin);
+	border-radius: var(--default-border-radius);
+	overflow: hidden;
+	margin: var(--default-margin);
+}
+#timer-work-break-switch * {
+	appearance: none;
+	display: block;
+	text-align: center;
+	outline: none;
+	border: none;
+	padding: var(--default-padding);
+	border-bottom: var(--default-margin) solid var(--accent-color-dark);
+	background-color: var(--accent-color-dim);
+	color: white;
+	flex-grow: 1;
+}
+#timer-work-break-switch .timer-switch-selected {
+	flex-grow: 2;
+	background-color: var(--accent-color-light);
+	border-bottom-color: var(--accent-color-dim);
+	color: black;
+}
+#timer-duration-controls {
+	display: flex;
+	flex-direction: row;
+	gap: var(--default-margin);
+	border-radius: var(--default-border-radius);
+	overflow: hidden;
+	margin: var(--default-margin);
+}
+#timer-duration-controls * {
+	flex-grow: 1;
+	align-self: stretch;
+}
+#timer-duration-controls * button {
+	appearance: none;
+	display: block;
+	width: 100%;
+	height: calc(var(--default-icon-width-and-height) + 2 * var(--default-padding));
+	text-align: center;
+	outline: none;
+	border: none;
+	padding: var(--default-padding);
+	border-bottom: var(--default-margin) solid var(--accent-color-dim);
+	background-color: var(--accent-color-light);
+}
+#timer-duration-controls * button::after {
+	display: inline-block;
+	width: var(--default-icon-width-and-height);
+	height: var(--default-icon-width-and-height);
+	content: "";
+	mask-image: url("graphics/triangle_arrow.svg");
+	background-color: var(--accent-color-dim);
+	vertical-align: middle;
+}
+#timer-duration-controls * button.time-duration-controls-increase::after {
+	transform: scale(1, -1);
+}
+#timer-duration-controls * button.timer-duration-controls-locked {
+	background-color: var(--accent-color-dim);
+	border-bottom-color: var(--accent-color-dark);
+}
+#timer-duration-controls * button.timer-duration-controls-locked::after {
+	background-color: var(--accent-color-light);
+}
+#timer-duration-controls * p {
+	text-align: center;
+	margin: 0.5rem 0;
+}
 #timer-play-options {
 	display: flex;
 	flex-direction: row;
@@ -104,75 +177,6 @@ nav {
 	mask-image: url("graphics/picture_in_picture.svg");
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
-}
-#timer-work-break-switch {
-	display: flex;
-	flex-direction: row;
-	gap: var(--default-margin);
-	border-radius: var(--default-border-radius);
-	overflow: hidden;
-	margin: var(--default-margin);
-}
-#timer-work-break-switch * {
-	appearance: none;
-	display: block;
-	text-align: center;
-	outline: none;
-	border: none;
-	padding: var(--default-padding);
-	background-color: var(--accent-color-dim);
-	color: white;
-	flex-grow: 1;
-}
-#timer-work-break-switch .timer-switch-selected {
-	flex-grow: 2;
-	background-color: var(--accent-color-light);
-	color: black;
-}
-#timer-duration-controls {
-	display: flex;
-	flex-direction: row;
-	gap: var(--default-margin);
-	border-radius: var(--default-border-radius);
-	overflow: hidden;
-	margin: var(--default-margin);
-}
-#timer-duration-controls * {
-	flex-grow: 1;
-	align-self: stretch;
-}
-#timer-duration-controls * button {
-	appearance: none;
-	display: block;
-	width: 100%;
-	height: calc(var(--default-icon-width-and-height) + 2 * var(--default-padding));
-	text-align: center;
-	outline: none;
-	border: none;
-	padding: var(--default-padding);
-	background-color: var(--accent-color-light);
-}
-#timer-duration-controls * button::after {
-	display: inline-block;
-	width: var(--default-icon-width-and-height);
-	height: var(--default-icon-width-and-height);
-	content: "";
-	mask-image: url("graphics/triangle_arrow.svg");
-	background-color: var(--accent-color-dim);
-	vertical-align: middle;
-}
-#timer-duration-controls * button.time-duration-controls-increase::after {
-	transform: scale(1, -1);
-}
-#timer-duration-controls * button.timer-duration-controls-locked {
-	background-color: var(--accent-color-dim);
-}
-#timer-duration-controls * button.timer-duration-controls-locked::after {
-	background-color: var(--accent-color-light);
-}
-#timer-duration-controls * p {
-	text-align: center;
-	margin: 0.5rem 0;
 }
 #white-noise-options, #binaural-options {
 	border-radius: var(--default-border-radius);
