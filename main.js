@@ -16,29 +16,14 @@ function start_timer() {
 	seconds = work_timer ? work_timer_set_seconds : break_timer_set_seconds;
 	timer_ms = 0;
 	if(work_timer) {
-		const timer_outer = document.getElementsByClassName('timer-outer');
-		for(let elem of timer_outer) {
-			elem.setAttribute('fill', '#222');
-		}
-		const timer_inner = document.getElementsByClassName('timer-inner');
-		for(let elem of timer_inner) {
-			elem.setAttribute('fill', '#888');
-		}
+		in_svg_timer_wrapper.classList.remove('timer-break');
 	} else {
-		const timer_outer = document.getElementsByClassName('timer-outer');
-		for(let elem of timer_outer) {
-			elem.setAttribute('fill', '#aa8');
-		}
-		const timer_inner = document.getElementsByClassName('timer-inner');
-		console.log(timer_inner.length);
-		for(let elem of timer_inner) {
-			elem.setAttribute('fill', '#bba');
-		}
+		in_svg_timer_wrapper.classList.add('timer-break');
 	}
 	requestAnimationFrame((timestamp) => prev_timestamp = timestamp);
 	requestAnimationFrame(update_timer);
 	timer_video.play();
-	timer_video.requestPictureInPicture(); // wrap in try-catch
+	// timer_video.requestPictureInPicture();
 	navigator.mediaSession.setActionHandler('play', () => {
 		toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
@@ -240,9 +225,10 @@ break_timer_set_seconds = 5 * 60; // default
 const to_canvas_img = document.createElement('img');
 const to_canvas_serializer = new XMLSerializer();
 const timer_svg = document.getElementById('timer-svg');
-const timer_button = document.getElementById('timer-button');
+const in_svg_timer_wrapper = document.getElementById('in-svg-timer-wrapper');
 const timer_circle = document.getElementById('timer-circle');
 const timer_text = document.getElementById('timer-text');
+const timer_button = document.getElementById('timer-button');
 
 {
 	const work_break_switch = document.getElementById('timer-work-break-switch');
@@ -360,6 +346,16 @@ timer_button.addEventListener('click', () => {
 	document.getElementById('timer-skip-button').addEventListener('click', () => {
 		timer_video.play();
 		start_timer();
+	});
+	document.addEventListener('visibilitychange', () => {
+		if(document.hidden) {
+			timer_video.play();
+			try {
+				timer_video.requestPictureInPicture();
+			} catch (err) {
+				// pass
+			}
+		}
 	});
 }, {once: true});
 
