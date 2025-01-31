@@ -169,7 +169,6 @@ nav {
 }
 #timer-duration-controls * button.timer-duration-controls-locked::after {
 	background-color: var(--accent-color-light);
-	mask-image: url("graphics/triangle_arrow_light.svg");
 }
 #timer-duration-controls * p {
 	text-align: center;
