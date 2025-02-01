@@ -183,7 +183,7 @@ document.getElementById('timer-pip-button').addEventListener('click', () => {
 	const work_break_switch = document.getElementById('timer-work-break-switch');
 	const controls_container = document.getElementById('timer-duration-controls');
 	const hours_minutes_seconds_display = {hours: document.createElement('p'), minutes: document.createElement('p'), seconds: document.createElement('p')};
-	function update_hours_minutes_seconds_display(unit_vals) {
+	function update_hours_minutes_seconds_display(units_vals) {
 		hours_minutes_seconds_display.seconds.textContent = units_vals[0];
 		hours_minutes_seconds_display.minutes.textContent = units_vals[1];
 		hours_minutes_seconds_display.hours.textContent = units_vals.length == 3 ? units_vals[2] : '0';
