@@ -58,10 +58,10 @@ function draw_timer(timestamp) {
 
 self.addEventListener('message', (message) => {
 	console.log('message received: ');
-	console.log(message);
-	switch(message.type) {
+	console.log(message.data);
+	switch(message.data.type) {
 		case 'init':
-			timer_canvas = message.canvas;
+			timer_canvas = message.data.canvas;
 			timer_canvas_context = timer_canvas.getContext('2d');
 			timer_ms = 0;
 			requestAnimationFrame((timestamp) => {prev_timestamp = timestamp});
@@ -71,22 +71,22 @@ self.addEventListener('message', (message) => {
 			start_timer();
 			break;
 		case 'pause':
-			paused = message.pause;
+			paused = message.data.pause;
 			break;
 		case 'reset':
 			timer_ms = 0;
 			paused = false;
 			break;
 		case 'duration-settings-change':
-			timer_durations = message.durations;
+			timer_durations = message.data.durations;
 			break;
 		case 'resize':
-			timer_dimensions_factor = message.dimensions_factor;
+			timer_dimensions_factor = message.data.dimensions_factor;
 			timer_canvas.width = 600 * timer_dimensions_factor;
 			timer_canvas.height = 675 * timer_dimensions_factor;
 			break;
 		case 'color-change':
-			timer_colors = message.colors;
+			timer_colors = message.data.colors;
 			break;
 	}
 });
