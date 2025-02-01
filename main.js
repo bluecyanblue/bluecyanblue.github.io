@@ -18,7 +18,7 @@ const timer_video = document.createElement('video');
 const timer_canvas = document.createElement('canvas');
 const timer_canvas_context = timer_canvas.getContext('2d');
 timer_canvas_context.width = 600;
-timer_canvas_context.height 675;
+timer_canvas_context.height = 675;
 timer_video.srcObject = timer_canvas.captureStream();
 document.getElementById('timer-wrapper').append(timer_canvas);
 const pip_timer_worker = new Worker('pip_timer_worker.js');
