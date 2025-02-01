@@ -208,7 +208,7 @@ const timer_video = document.createElement('video');
 const timer_canvas = document.createElement('canvas');
 timer_canvas.width = 600;
 timer_canvas.height = 675;
-const timer_canvas_context = canvas.getContext('2d');
+const timer_canvas_context = timer_canvas.getContext('2d');
 timer_canvas_context.fillStyle = 'white';
 timer_canvas_context.fillRect(0, 0, timer_canvas.width, timer_canvas.height);
 const to_canvas_img = document.createElement('img');
