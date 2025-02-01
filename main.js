@@ -9,8 +9,6 @@ function util_s_to_hmmss(s) {
 	return (s ? `${s}:` : '') + `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
 
-// issues currently:
-// timer not working
 function queue_frame(callback) {
 	setTimeout(() => {callback(performance.now())}, 0);
 }
@@ -27,8 +25,6 @@ function start_timer() {
 	} else {
 		in_svg_timer_wrapper.classList.add('timer-break');
 	}
-	// requestAnimationFrame((timestamp) => prev_timestamp = timestamp);
-	// requestAnimationFrame(update_timer);
 	queue_frame((timestamp) => prev_timestamp = timestamp);
 	queue_frame(update_timer);
 }
@@ -36,8 +32,6 @@ function start_timer() {
 function toggle_pause(pause) {
 	paused = pause;
 	if(!paused) {
-		// requestAnimationFrame((timestamp) => prev_timestamp = timestamp);
-		// requestAnimationFrame(update_timer);
 		queue_frame((timestamp) => prev_timestamp = timestamp);
 		queue_frame(update_timer);
 	}
@@ -66,7 +60,6 @@ function update_timer(timestamp) {
 	}
 	let url = to_canvas_serializer.serializeToString(timer_svg);
 	to_canvas_img.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(url);
-	// requestAnimationFrame(update_timer);
 	queue_frame(update_timer);
 }
 
@@ -203,50 +196,22 @@ to_canvas_img.addEventListener('load', () => {
 const to_canvas_serializer = new XMLSerializer();
 timer_video.srcObject = timer_canvas.captureStream(30);
 
-// document.getElementById('timer-wrapper').append(timer_canvas);
-// const pip_timer_worker = new Worker('pip_timer_worker.js');
-// const offscreen_canvas = timer_canvas.transferControlToOffscreen();
-// pip_timer_worker.postMessage({type: 'init', canvas: offscreen_canvas}, [offscreen_canvas]);
-// pip_timer_worker.postMessage({type: 'color-change', colors: {light: '#eee', dim: '#888', dark: '#222', alt_light: '#ccb', alt_dim: '#bba', alt_dark: '#aa8'}});
-// const log = document.getElementById('log');
-// pip_timer_worker.addEventListener('message', (message) => {
-	// log.textContent += message.data;
-	// log.textContent += '\n';
-// });
-
-// {
-	// const content_wrapper = document.getElementById('content-wrapper');
-	
-	// const media_query = matchMedia('(min-aspect-ratio: 4/3)');
-	// window.addEventListener('resize', () => {
-		// if(media_query.matches){
-				// pip_timer_worker.postMessage({type: 'resize', dimensions_factor: content_wrapper.offsetHeight / 675});
-		// } else {
-			// pip_timer_worker.postMessage({type: 'resize', dimensions_factor: content_wrapper.offsetWidth / 600});
-		// }
-	// });
-	// window.dispatchEvent(new Event('resize'));
-// }
-
 function set_up_picture_in_picture() {
 	timer_video.play();
 	timer_video.requestPictureInPicture();
 	navigator.mediaSession.setActionHandler('play', () => {
-		// pip_timer_worker.postMessage({type: 'pause', pause: false});
 		toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
 		if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 	});
 	navigator.mediaSession.setActionHandler('pause', () => {
-		// pip_timer_worker.postMessage({type: 'pause', pause: true});
 		toggle_pause(true);
 		timer_button.classList.add('timer-button-paused');
 		timer_video.pause();
 		if(noise_generation_context) noise_generation_context.suspend();
 	});
 	navigator.mediaSession.setActionHandler('previoustrack', () => {
-		// pip_timer_worker.postMessage({type: 'reset'});
 		timer_ms = 0;
 		if(paused) toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
@@ -256,7 +221,6 @@ function set_up_picture_in_picture() {
 		timer_button.classList.remove('timer-button-paused');
 		if(paused) toggle_pause(false);
 		timer_video.play();
-		// pip_timer_worker.postMessage({type: 'timer-start'});
 		start_timer();
 	});
 }
@@ -271,7 +235,6 @@ document.getElementById('timer-pip-button').addEventListener('click', set_up_pic
 		hours_minutes_seconds_display.seconds.textContent = units_vals[0];
 		hours_minutes_seconds_display.minutes.textContent = units_vals[1];
 		hours_minutes_seconds_display.hours.textContent = units_vals.length == 3 ? units_vals[2] : '0';
-		// pip_timer_worker.postMessage({type: 'duration-settings-change', durations: {work_timer_duration: work_timer_set_seconds, break_timer_duration: break_timer_set_seconds}});
 	}
 	update_hours_minutes_seconds_display(util_s_to_hmmss(work_timer_set_seconds).split(':').reverse());
 	let selected_work_timer = true; // select work/break
@@ -443,18 +406,15 @@ document.getElementById('timer-pip-button').addEventListener('click', set_up_pic
 }
 
 timer_button.addEventListener('click', () => {
-	// pip_timer_worker.postMessage({type: 'timer-start'});
 	start_timer();
 	timer_button.classList.remove('timer-button-paused');
 	timer_button.addEventListener('click', () => {
 		if(paused) {
-			// pip_timer_worker.postMessage({type: 'pause', pause: false});
 			toggle_pause(false);
 			timer_button.classList.remove('timer-button-paused');
 			timer_video.play();
 			if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 		} else {
-			// pip_timer_worker.postMessage({type: 'pause', pause: true});
 			toggle_pause(true);
 			timer_button.classList.add('timer-button-paused');
 			timer_video.pause();
@@ -462,7 +422,6 @@ timer_button.addEventListener('click', () => {
 		}
 	});
 	document.getElementById('timer-reset-button').addEventListener('click', () => {
-		// pip_timer_worker.postMessage({type: 'reset'});
 		timer_ms = 0;
 		if(paused) toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
@@ -472,7 +431,6 @@ timer_button.addEventListener('click', () => {
 		timer_button.classList.remove('timer-button-paused');
 		if(paused) toggle_pause(false);
 		timer_video.play();
-		// pip_timer_worker.postMessage({type: 'timer-start'});
 		start_timer();
 		
 	});
