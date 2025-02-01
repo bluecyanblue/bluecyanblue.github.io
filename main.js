@@ -310,7 +310,21 @@ document.getElementById('timer-pip-button').addEventListener('click', set_up_pic
 	work_break_switch.append(switch_work_timer);
 	work_break_switch.append(switch_break_timer);
 	
-	for(let i = 0; i < 3; i++){
+	let scroll_update_mutex = false;
+	
+	for(let i = 0; i< 3; i++) {
+		let current_unit_division;
+		switch(i) {
+			case 0:
+				current_unit_division = 'hours';
+				break;
+			case 1:
+				current_unit_division = 'minutes';
+				break;
+			case 2:
+				current_unit_division = 'seconds';
+				break;
+		}
 		const unit_division_container = document.createElement('div');
 		const increase_button = document.createElement('button');
 		const decrease_button = document.createElement('button');
@@ -353,19 +367,92 @@ document.getElementById('timer-pip-button').addEventListener('click', set_up_pic
 		if(work_timer_set_seconds <= factor) decrease_button.classList.add('button-selected');
 		
 		unit_division_container.append(increase_button);
-		switch(i) {
-			case 0:
-				unit_division_container.append(hours_minutes_seconds_display.hours);
-				break;
-			case 1:
-				unit_division_container.append(hours_minutes_seconds_display.minutes);
-				break;
-			case 2:
-				unit_division_container.append(hours_minutes_seconds_display.seconds);
-				break;
-		}
+		unit_division_container.append(hours_minutes_seconds_display[current_unit_division]);
+		
 		unit_division_container.append(decrease_button);
 		controls_container.append(unit_division_container);
+		
+		{
+			let cumulative_scroll = 0;
+			let current_value = parseInt(hours_minutes_seconds_display[current_unit_division].textContent, 10);
+			let scrolling_timeout = null;
+			hours_minutes_seconds_display[current_unit_division].addEventListener('wheel', (e) => {
+				if(scroll_update_mutex && scroll_update_mutex != current_unit_division) return;
+				e.preventDefault();
+				scroll_update_mutex = current_unit_division;
+				if(scrolling_timeout) clearTimeout(scrolling_timeout);
+				let deltaY = - e.deltaY / 100;
+				if(current_value + cumulative_scroll + deltaY < 0) {
+					cumulative_scroll = -current_value;
+					decrease_button.classList.add('button-selected');
+				} else {
+					decrease_button.classList.remove('button-selected');
+					cumulative_scroll += deltaY;
+				}
+				let unit_display_val = Math.floor(current_value + cumulative_scroll).toString();
+				if(unit_display_val.length == 1 && current_unit_division != 'hours') unit_display_val = '0' + unit_display_val;
+				hours_minutes_seconds_display[current_unit_division].textContent = unit_display_val;
+				scrolling_timeout = setTimeout(() => {
+					if(selected_work_timer) {
+						work_timer_set_seconds += Math.floor(cumulative_scroll) * factor;
+						work_timer_set_seconds = Math.max(1, work_timer_set_seconds);	
+					} else {
+						break_timer_set_seconds += Math.floor(cumulative_scroll) * factor;
+						break_timer_set_seconds = Math.max(1, break_timer_set_seconds);
+					}
+					update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
+					cumulative_scroll = 0;
+					current_value = parseInt(hours_minutes_seconds_display[current_unit_division].textContent, 10);
+					scrolling_timeout = null;
+					scroll_update_mutex = false;
+					if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
+						decrease_button.classList.add('button-selected');
+					} else {
+						decrease_button.classList.remove('button-selected');
+					}
+				}, 1000); // update the actual value once scrolling is done
+			});	
+		}
+		{
+			let current_value = parseInt(hours_minutes_seconds_display[current_unit_division].textContent, 10);
+			let interaction = null;
+			hours_minutes_seconds_display[current_unit_division].addEventListener('pointerdown', () => {
+				function onpointermove_callback(e) {
+					if(!interaction) interaction = {id: e.pointerId, y: e.pageY};
+					if(e.pointerId != interaction.id) return;
+					let unit_display_val = Math.max(0, Math.floor(current_value + ((interaction.y - e.pageY) / 10))).toString();
+					if(unit_display_val == '0') {
+						decrease_button.classList.add('button-selected');
+					} else {
+						decrease_button.classList.remove('button-selected');
+					}
+					if(unit_display_val.length == 1 && current_unit_division != 'hours') unit_display_val = '0' + unit_display_val;
+					hours_minutes_seconds_display[current_unit_division].textContent = unit_display_val;
+				}
+				function onpointerup_callback(e) {
+					if(!interaction || e.pointerId != interaction.id) return;
+					if(selected_work_timer) {
+						work_timer_set_seconds += Math.max(-current_value, Math.floor((interaction.y - e.pageY) / 10)) * factor;
+						work_timer_set_seconds = Math.max(1, work_timer_set_seconds);				
+					} else {
+						break_timer_set_seconds += Math.max(-current_value, Math.floor((interaction.y - e.pageY) / 10)) * factor;
+						break_timer_set_seconds = Math.max(1, break_timer_set_seconds);
+					}
+					update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
+					current_value = parseInt(hours_minutes_seconds_display[current_unit_division].textContent, 10);
+					interaction = null;
+					if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
+						decrease_button.classList.add('button-selected');
+					} else {
+						decrease_button.classList.remove('button-selected');
+					}
+					window.removeEventListener('pointermove', onpointermove_callback);
+					window.removeEventListener('pointerup', onpointerup_callback);
+				}
+				window.addEventListener('pointermove', onpointermove_callback);
+				window.addEventListener('pointerup', onpointerup_callback);
+			});
+		}
 	}
 }
 
@@ -428,9 +515,9 @@ timer_button.addEventListener('click', () => {
 	const media_query = matchMedia('(min-aspect-ratio: 4/3)');
 	window.addEventListener('resize', () => {
 		if(media_query.matches){
-				timer_wrapper.style.transform = `translate(${(600 * content_wrapper.offsetHeight / 675) * ((content_wrapper.offsetHeight / 675) - 1) / 2}px, ${content_wrapper.offsetHeight * (content_wrapper.offsetHeight / 675 - 1) / 2}px) scale(${content_wrapper.offsetHeight / 675})`; 
-				timer_wrapper.style.width = `${600 * content_wrapper.offsetHeight / 675}px`;
-				timer_wrapper.style.height = '';
+			timer_wrapper.style.transform = `translate(${(600 * content_wrapper.offsetHeight / 675) * ((content_wrapper.offsetHeight / 675) - 1) / 2}px, ${content_wrapper.offsetHeight * (content_wrapper.offsetHeight / 675 - 1) / 2}px) scale(${content_wrapper.offsetHeight / 675})`; 
+			timer_wrapper.style.width = `${600 * content_wrapper.offsetHeight / 675}px`;
+			timer_wrapper.style.height = '';
 		} else {
 			timer_wrapper.style.transform = `translate(${(content_wrapper.offsetWidth - 600) / 2}px, ${(675 * content_wrapper.offsetWidth / 600) * ((content_wrapper.offsetWidth / 600) - 1) / 2}px) scale(${content_wrapper.offsetWidth / 600})`;
 			timer_wrapper.style.width = '600px';

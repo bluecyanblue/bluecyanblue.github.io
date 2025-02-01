@@ -112,6 +112,8 @@ nav {
 #timer-duration-controls * p {
 	text-align: center;
 	margin: 0.5rem 0;
+	-webkit-user-select: none;
+	user-select: none;
 }
 #timer-play-options {
 	display: flex;
