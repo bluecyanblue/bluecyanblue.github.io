@@ -16,7 +16,6 @@ work_timer_set_seconds = 25 * 60; // default
 break_timer_set_seconds = 5 * 60; // default
 const timer_video = document.createElement('video');
 const timer_canvas = document.createElement('canvas');
-const timer_canvas_context = timer_canvas.getContext('2d');
 timer_canvas_context.width = 600;
 timer_canvas_context.height = 675;
 timer_video.srcObject = timer_canvas.captureStream();
