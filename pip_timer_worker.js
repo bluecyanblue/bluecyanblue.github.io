@@ -56,6 +56,7 @@ function draw_timer(timestamp) {
 }
 
 self.addEventListener('message', (message) => {
+	console.log('yay');
 	switch(message.type) {
 		case 'init':
 			timer_canvas = message.canvas;

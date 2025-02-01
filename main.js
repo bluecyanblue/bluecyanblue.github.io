@@ -9,71 +9,10 @@ function util_s_to_hmmss(s) {
 	return (s ? `${s}:` : '') + `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
 
-timer_started = false;
-var break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused;
-work_timer = false; // for alternating between work/break blocks
-work_timer_set_seconds = 25 * 60; // default
-break_timer_set_seconds = 5 * 60; // default
-const timer_button = document.getElementById('timer-button');
-const timer_video = document.createElement('video');
-const timer_canvas = document.createElement('canvas');
-timer_canvas.width = 600;
-timer_canvas.height = 675;
-timer_video.srcObject = timer_canvas.captureStream();
-document.getElementById('timer-wrapper').append(timer_canvas);
-const pip_timer_worker = new Worker('pip_timer_worker.js');
-const offscreen_canvas = timer_canvas.transferControlToOffscreen();
-pip_timer_worker.postMessage({type: 'init', canvas: offscreen_canvas}, [offscreen_canvas]);
-pip_timer_worker.postMessage({type: 'color-change', colors: {light: '#eee', dim: '#888', dark: '#222', alt_light: '#ccb', alt_dim: '#bba', alt_dark: '#aa8'}});
-
-{
-	const content_wrapper = document.getElementById('content-wrapper');
-	
-	const media_query = matchMedia('(min-aspect-ratio: 4/3)');
-	window.addEventListener('resize', () => {
-		if(media_query.matches){
-				pip_timer_worker.postMessage({type: 'resize', dimensions_factor: content_wrapper.offsetHeight / 675});
-		} else {
-			pip_timer_worker.postMessage({type: 'resize', dimensions_factor: content_wrapper.offsetWidth / 600});
-		}
-	});
-	window.dispatchEvent(new Event('resize'));
-}
-
-function set_up_picture_in_picture() {
-	timer_video.play();
-	timer_video.requestPictureInPicture();
-	navigator.mediaSession.setActionHandler('play', () => {
-		pip_timer_worker.postMessage({type: 'pause', pause: false});
-		timer_button.classList.remove('timer-button-paused');
-		timer_video.play();
-		if(!noise_muted) noise_generation_context.resume();
-	});
-	navigator.mediaSession.setActionHandler('pause', () => {
-		pip_timer_worker.postMessage({type: 'pause', pause: true});
-		timer_button.classList.add('timer-button-paused');
-		timer_video.pause();
-		noise_generation_context.suspend();
-	});
-	navigator.mediaSession.setActionHandler('previoustrack', () => {
-		pip_timer_worker.postMessage({type: 'reset'});
-		timer_button.classList.remove('timer-button-paused');
-		timer_video.play();
-	});
-	navigator.mediaSession.setActionHandler('nexttrack', () => {
-		timer_button.classList.remove('timer-button-paused');
-		timer_video.play();
-		pip_timer_worker.postMessage({type: 'timer-start'});
-	});
-}
-
-document.getElementById('timer-pip-button').addEventListener('click', () => {
-	if(!timer_started) {
-		pip_timer_worker.postMessage({type: 'timer-start'});
-	} else {
-		set_up_picture_in_picture();
-	}
-});
+// issues currently:
+// timer not working
+// not even appended
+// video metadata not loaded
 
 {
 	const noise_buttons = [document.getElementById('white-noise-button'), document.getElementById('pink-noise-button'), document.getElementById('brown-noise-button'), document.getElementById('binaural-beats-button')]
@@ -180,6 +119,72 @@ document.getElementById('timer-pip-button').addEventListener('click', () => {
 	}
 }
 
+timer_started = false;
+var break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused, noise_generation_context;
+work_timer = false; // for alternating between work/break blocks
+work_timer_set_seconds = 25 * 60; // default
+break_timer_set_seconds = 5 * 60; // default
+const timer_button = document.getElementById('timer-button');
+const timer_video = document.createElement('video');
+const timer_canvas = document.createElement('canvas');
+timer_canvas.width = 600;
+timer_canvas.height = 675;
+timer_video.srcObject = timer_canvas.captureStream();
+console.log(document.getElementById('timer-wrapper'));
+document.getElementById('timer-wrapper').append(timer_canvas);
+console.log(document.getElementById('timer-wrapper'));
+for (let i of document.getElementById('timer-wrapper').children) {
+	console.log('child');
+	console.log(i);
+}
+const pip_timer_worker = new Worker('pip_timer_worker.js');
+const offscreen_canvas = timer_canvas.transferControlToOffscreen();
+pip_timer_worker.postMessage({type: 'init', canvas: offscreen_canvas}, [offscreen_canvas]);
+pip_timer_worker.postMessage({type: 'color-change', colors: {light: '#eee', dim: '#888', dark: '#222', alt_light: '#ccb', alt_dim: '#bba', alt_dark: '#aa8'}});
+
+{
+	const content_wrapper = document.getElementById('content-wrapper');
+	
+	const media_query = matchMedia('(min-aspect-ratio: 4/3)');
+	window.addEventListener('resize', () => {
+		if(media_query.matches){
+				pip_timer_worker.postMessage({type: 'resize', dimensions_factor: content_wrapper.offsetHeight / 675});
+		} else {
+			pip_timer_worker.postMessage({type: 'resize', dimensions_factor: content_wrapper.offsetWidth / 600});
+		}
+	});
+	window.dispatchEvent(new Event('resize'));
+}
+
+function set_up_picture_in_picture() {
+	timer_video.play();
+	timer_video.requestPictureInPicture();
+	navigator.mediaSession.setActionHandler('play', () => {
+		pip_timer_worker.postMessage({type: 'pause', pause: false});
+		timer_button.classList.remove('timer-button-paused');
+		timer_video.play();
+		if(!noise_muted) noise_generation_context.resume();
+	});
+	navigator.mediaSession.setActionHandler('pause', () => {
+		pip_timer_worker.postMessage({type: 'pause', pause: true});
+		timer_button.classList.add('timer-button-paused');
+		timer_video.pause();
+		noise_generation_context.suspend();
+	});
+	navigator.mediaSession.setActionHandler('previoustrack', () => {
+		pip_timer_worker.postMessage({type: 'reset'});
+		timer_button.classList.remove('timer-button-paused');
+		timer_video.play();
+	});
+	navigator.mediaSession.setActionHandler('nexttrack', () => {
+		timer_button.classList.remove('timer-button-paused');
+		timer_video.play();
+		pip_timer_worker.postMessage({type: 'timer-start'});
+	});
+}
+
+document.getElementById('timer-pip-button').addEventListener('click', set_up_picture_in_picture);
+
 {
 	const work_break_switch = document.getElementById('timer-work-break-switch');
 	const controls_container = document.getElementById('timer-duration-controls');
@@ -227,7 +232,7 @@ document.getElementById('timer-pip-button').addEventListener('click', () => {
 				break_timer_set_seconds += factor;
 			}
 			update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
-			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) > factor) decrease_button.classList.remove('timer-duration-controls-locked');
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) > factor) decrease_button.classList.remove('button-selected');
 		});
 		switch_work_timer.addEventListener('click', () => {
 			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
@@ -244,7 +249,7 @@ document.getElementById('timer-pip-button').addEventListener('click', () => {
 				break_timer_set_seconds -= factor;
 			}
 			update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
-			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) decrease_button.classList.add('timer-duration-controls-locked');
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) decrease_button.classList.add('button-selected');
 		});
 		switch_break_timer.addEventListener('click', () => {
 			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
