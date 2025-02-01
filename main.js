@@ -121,6 +121,7 @@ function util_s_to_hmmss(s) {
 
 timer_started = false;
 var break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused, noise_generation_context;
+noise_generation_context = null;
 work_timer = false; // for alternating between work/break blocks
 work_timer_set_seconds = 25 * 60; // default
 break_timer_set_seconds = 5 * 60; // default
@@ -163,13 +164,13 @@ function set_up_picture_in_picture() {
 		pip_timer_worker.postMessage({type: 'pause', pause: false});
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
-		if(!noise_muted) noise_generation_context.resume();
+		if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 	});
 	navigator.mediaSession.setActionHandler('pause', () => {
 		pip_timer_worker.postMessage({type: 'pause', pause: true});
 		timer_button.classList.add('timer-button-paused');
 		timer_video.pause();
-		noise_generation_context.suspend();
+		if(noise_generation_context) noise_generation_context.suspend();
 	});
 	navigator.mediaSession.setActionHandler('previoustrack', () => {
 		pip_timer_worker.postMessage({type: 'reset'});
@@ -285,12 +286,12 @@ timer_button.addEventListener('click', () => {
 			pip_timer_worker.postMessage({type: 'pause', pause: false});
 			timer_button.classList.remove('timer-button-paused');
 			timer_video.play();
-			if(!noise_muted) noise_generation_context.resume();
+			if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 		} else {
 			pip_timer_worker.postMessage({type: 'pause', pause: true});
 			timer_button.classList.add('timer-button-paused');
 			timer_video.pause();
-			noise_generation_context.suspend();
+			if(noise_generation_context) noise_generation_context.suspend();
 		}
 	});
 	document.getElementById('timer-reset-button').addEventListener('click', () => {
