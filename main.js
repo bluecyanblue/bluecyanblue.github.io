@@ -91,7 +91,6 @@ function update_timer(timestamp) {
 	function start_noise(e) {
 		const noise_generation_context = new AudioContext();
 		noise_generation_context.suspend();
-		noise_muted = true;
 
 		// noise
 		const white_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
@@ -198,8 +197,9 @@ function update_timer(timestamp) {
 }
 
 timer_started = false;
-var break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused, noise_generation_context;
+var break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused, noise_generation_context, noise_muted;
 noise_generation_context = null;
+noise_muted = true;
 work_timer = false; // for alternating between work/break blocks
 work_timer_set_seconds = 25 * 60; // default
 break_timer_set_seconds = 5 * 60; // default
@@ -213,10 +213,10 @@ timer_canvas_context.fillStyle = 'white';
 timer_canvas_context.fillRect(0, 0, timer_canvas.width, timer_canvas.height);
 const to_canvas_img = document.createElement('img');
 to_canvas_img.addEventListener('load', () => {
-	timer_canvas_ctx.drawImage(to_canvas_img, 0, 0);
+	timer_canvas_context.drawImage(to_canvas_img, 0, 0);
 });
 const to_canvas_serializer = new XMLSerializer();
-timer_video.srcObject = timer_canvas.captureStream();
+timer_video.srcObject = timer_canvas.captureStream(30);
 // document.getElementById('timer-wrapper').append(timer_canvas);
 // const pip_timer_worker = new Worker('pip_timer_worker.js');
 // const offscreen_canvas = timer_canvas.transferControlToOffscreen();

@@ -109,9 +109,6 @@ nav {
 #timer-duration-controls * button.time-duration-controls-increase::after {
 	transform: scale(1, -1);
 }
-#timer-duration-controls * button.button-selected::after {
-	background-color: var(--accent-color-light);
-}
 #timer-duration-controls * p {
 	text-align: center;
 	margin: 0.5rem 0;
@@ -284,4 +281,7 @@ nav {
 	background-color: var(--accent-color-dim) !important;
 	border-bottom-color: var(--accent-color-dark) !important;
 	color: var(--accent-color-light) !important;
+}
+.button-selected::after {
+	background-color: var(--accent-color-light) !important;
 }
