@@ -21,6 +21,7 @@ function start_timer() {
 }
 
 function draw_timer(timestamp) {
+	console.log('unless I am stupid, this should work');
 	timer_canvas_context.fillStyle = 'white';
 	timer_canvas_context.fillRect(0, 0, timer_canvas_context.width, timer_canvas_context.length);
 	timer_canvas_context.fillStyle = timer_break ? timer_colors.alt_dark : timer_colors.dark;
@@ -56,7 +57,8 @@ function draw_timer(timestamp) {
 }
 
 self.addEventListener('message', (message) => {
-	console.log('yay');
+	console.log('message received: ');
+	console.log(message);
 	switch(message.type) {
 		case 'init':
 			timer_canvas = message.canvas;
