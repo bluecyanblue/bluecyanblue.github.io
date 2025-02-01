@@ -9,86 +9,71 @@ function util_s_to_hmmss(s) {
 	return (s ? `${s}:` : '') + `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
 
-function start_timer() {
-	paused = false;
-	timer_started = true;
-	work_timer = !work_timer;
-	seconds = work_timer ? work_timer_set_seconds : break_timer_set_seconds;
-	timer_ms = 0;
-	if(work_timer) {
-		in_svg_timer_wrapper.classList.remove('timer-break');
-	} else {
-		in_svg_timer_wrapper.classList.add('timer-break');
-	}
-	requestAnimationFrame((timestamp) => prev_timestamp = timestamp);
-	requestAnimationFrame(update_timer);
+timer_started = false;
+var break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused;
+work_timer = false; // for alternating between work/break blocks
+work_timer_set_seconds = 25 * 60; // default
+break_timer_set_seconds = 5 * 60; // default
+const timer_video = document.createElement('video');
+const timer_canvas = document.createElement('canvas');
+const timer_canvas_context = timer_canvas.getContext('2d');
+timer_canvas_context.width = 600;
+timer_canvas_context.height 675;
+timer_video.srcObject = timer_canvas.captureStream();
+document.getElementById('timer-wrapper').append(timer_canvas);
+const pip_timer_worker = new Worker('pip_timer_worker.js');
+const offscreen_canvas = timer_canvas.transferControlToOffscreen();
+pip_timer_worker.postMessage({type: 'init', canvas: offscreen_canvas}, [offscreen_canvas]);
+pip_timer_worker.postMessage({type: 'color-change', colors: {light: '#eee', dim: '#888', dark: '#222', alt_light: '#ccb', alt_dim: '#bba', alt_dark: '#aa8'}});
+
+{
+	const content_wrapper = document.getElementById('content-wrapper');
+	
+	const media_query = matchMedia('(min-aspect-ratio: 4/3)');
+	window.addEventListener('resize', () => {
+		if(media_query.matches){
+				pip_timer_worker.postMessage({type: 'resize', dimensions_factor: content_wrapper.offsetHeight / 675}});
+		} else {
+			pip_timer_worker.postMessage({type: 'resize', dimensions_factor: content_wrapper.offsetWidth / 600});
+		}
+	});
+	window.dispatchEvent(new Event('resize'));
+}
+
+function set_up_picture_in_picture() {
 	timer_video.play();
+	timer_video.requestPictureInPicture();
 	navigator.mediaSession.setActionHandler('play', () => {
-		toggle_pause(false);
+		pip_timer_worker.postMessage({type: 'pause', pause: false});
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
 		if(!noise_muted) noise_generation_context.resume();
 	});
 	navigator.mediaSession.setActionHandler('pause', () => {
-		toggle_pause(true);
+		pip_timer_worker.postMessage({type: 'pause', pause: true});
 		timer_button.classList.add('timer-button-paused');
 		timer_video.pause();
 		noise_generation_context.suspend();
 	});
 	navigator.mediaSession.setActionHandler('previoustrack', () => {
-		timer_ms = 0;
-		if(paused) toggle_pause(false);
+		pip_timer_worker.postMessage({type: 'reset'});
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
 	});
 	navigator.mediaSession.setActionHandler('nexttrack', () => {
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
-		start_timer();
+		pip_timer_worker.postMessage({type: 'timer-start'});
 	});
 }
 
-function toggle_pause(pause) {
-	paused = pause;
-	if(!paused) {
-		requestAnimationFrame((timestamp) => prev_timestamp = timestamp);
-		requestAnimationFrame(update_timer);
+document.getElementById('timer-pip-button').addEventListener('click', () => {
+	if(!timer_started) {
+		pip_timer_worker.postMessage({type: 'timer-start'});
+	} else {
+		set_up_picture_in_picture();
 	}
-}
-
-function update_timer(timestamp) {
-	if(paused) return;
-	if(timer_ms >= seconds * 1000) {
-		start_timer();
-		return;
-	}
-	timer_ms += timestamp - prev_timestamp;
-	prev_timestamp = timestamp;
-	let angle = ((timer_ms * 2 * Math.PI / 1000) / seconds) % (2 * Math.PI);
-	timer_circle.setAttribute('d', `M 300 175 A 200 200 0 ${ angle > Math.PI ? 0 : 1} 0 ${300 + 200 * Math.sin(angle)} ${375 - 200 * Math.cos(angle)}`);
-	let current_font_size = parseInt(timer_text.getAttribute('font-size'), 10);
-	timer_text.textContent = util_s_to_hmmss(Math.ceil(seconds - (timer_ms / 1000)));
-	let timer_text_width = timer_text.getComputedTextLength();
-	let cur_timer_text_chars = timer_text.textContent.length;
-	if(timer_text_width > 250 || cur_timer_text_chars != prev_timer_text_chars || timestamp == 0){
-		timer_text.setAttribute('font-size', current_font_size * (250 / timer_text_width));
-		prev_timer_text_chars = cur_timer_text_chars;
-	}
-	let url = to_canvas_serializer.serializeToString(timer_svg);
-	to_canvas_img.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(url);
-	requestAnimationFrame(update_timer);
-}
-
-timer_started = false;
-const timer_canvas = document.createElement('canvas');
-timer_canvas.width = 600;
-timer_canvas.height = 675;
-const timer_canvas_ctx = timer_canvas.getContext('2d');
-timer_canvas_ctx.fillStyle = 'white';
-timer_canvas_ctx.fillRect(0, 0, timer_canvas.width, timer_canvas.height);
-const timer_video = document.createElement('video');
-const timer_canvas_stream = timer_canvas.captureStream(30)
-timer_video.srcObject = timer_canvas_stream;
+});
 
 {
 	const noise_buttons = [document.getElementById('white-noise-button'), document.getElementById('pink-noise-button'), document.getElementById('brown-noise-button'), document.getElementById('binaural-beats-button')]
@@ -160,8 +145,6 @@ timer_video.srcObject = timer_canvas_stream;
 			oscillator_right.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) - (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
 		}
 		function generate_source_playing_function(source) {
-			console.log('yay');
-			console.log(source);
 			return () => {
 				noise_muted = false;
 				for(let i in audio_source_nodes) {
@@ -171,7 +154,7 @@ timer_video.srcObject = timer_canvas_stream;
 				noise_generation_context.resume();
 			};
 		}
-		for (let i in noise_buttons) {
+		for(let i in noise_buttons) {
 			noise_buttons[i].addEventListener('click', generate_source_playing_function(audio_source_nodes[i]));
 		}
 		document.getElementById('binaural-beats-button').addEventListener('click', () => {update_oscillator_frequencies();})
@@ -181,41 +164,33 @@ timer_video.srcObject = timer_canvas_stream;
 		});
 		binaural_diff_range.addEventListener('change', update_oscillator_frequencies);
 		binaural_base_freq.addEventListener('change', update_oscillator_frequencies);
-		for (let i in noise_buttons) {
+		for(let i in noise_buttons) {
 			noise_buttons[i].removeEventListener('click', start_noise);
 		}
 		(generate_source_playing_function(audio_source_nodes[noise_buttons.indexOf(e.target)]))();
 	}
-	for (let i in noise_buttons) {
+	for(let i in noise_buttons) {
 		noise_buttons[i].addEventListener('click', start_noise);
+		noise_buttons[i].addEventListener('click', (e) => {
+			for(let j in noise_buttons) {
+				noise_buttons[j].classList.remove('button-selected');
+			}
+			e.target.classList.add('button-selected');
+		});
 	}
 }
-
-
-var break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused;
-work_timer = false; // for alternating between work/break blocks
-work_timer_set_seconds = 25 * 60; // default
-break_timer_set_seconds = 5 * 60; // default
-const to_canvas_img = document.createElement('img');
-const to_canvas_serializer = new XMLSerializer();
-const timer_svg = document.getElementById('timer-svg');
-const in_svg_timer_wrapper = document.getElementById('in-svg-timer-wrapper');
-const timer_circle = document.getElementById('timer-circle');
-const timer_text = document.getElementById('timer-text');
-const timer_button = document.getElementById('timer-button');
 
 {
 	const work_break_switch = document.getElementById('timer-work-break-switch');
 	const controls_container = document.getElementById('timer-duration-controls');
 	const hours_minutes_seconds_display = {hours: document.createElement('p'), minutes: document.createElement('p'), seconds: document.createElement('p')};
-	function update_hours_minutes_seconds_display(units_vals) {
+	function update_hours_minutes_seconds_display(unit_vals) {
 		hours_minutes_seconds_display.seconds.textContent = units_vals[0];
 		hours_minutes_seconds_display.minutes.textContent = units_vals[1];
 		hours_minutes_seconds_display.hours.textContent = units_vals.length == 3 ? units_vals[2] : '0';
+		pip_timer_worker.postMessage({type: 'duration-settings-change', durations: {work_timer_duration: work_timer_set_seconds, break_timer_duration: break_timer_set_seconds}});
 	}
-	hours_minutes_seconds_display.hours.textContent = '0';
-	hours_minutes_seconds_display.minutes.textContent = '25';
-	hours_minutes_seconds_display.seconds.textContent = '00';
+	update_hours_minutes_seconds_display(util_s_to_hmmss(work_timer_set_seconds).split(':').reverse());
 	let selected_work_timer = true; // select work/break
 	
 	const switch_work_timer = document.createElement('button');
@@ -296,36 +271,36 @@ const timer_button = document.getElementById('timer-button');
 		controls_container.append(unit_division_container);
 	}
 }
+
 timer_button.addEventListener('click', () => {
-	start_timer();
+	pip_timer_worker.postMessage({type: 'timer-start'});
 	timer_button.classList.remove('timer-button-paused');
 	timer_button.addEventListener('click', () => {
 		if(paused) {
-			toggle_pause(false);
+			pip_timer_worker.postMessage({type: 'pause', pause: false});
 			timer_button.classList.remove('timer-button-paused');
 			timer_video.play();
 			if(!noise_muted) noise_generation_context.resume();
 		} else {
-			toggle_pause(true);
+			pip_timer_worker.postMessage({type: 'pause', pause: true});
 			timer_button.classList.add('timer-button-paused');
 			timer_video.pause();
 			noise_generation_context.suspend();
 		}
 	});
 	document.getElementById('timer-reset-button').addEventListener('click', () => {
-		timer_ms = 0;
-		if(paused) toggle_pause(false);
+		pip_timer_worker.postMessage({type: 'reset'});
 		timer_video.play();
 	});
 	document.getElementById('timer-skip-button').addEventListener('click', () => {
 		timer_video.play();
-		start_timer();
+		pip_timer_worker.postMessage({type: 'timer-start'});
 	});
 	document.addEventListener('visibilitychange', () => {
 		if(document.hidden) {
 			timer_video.play();
 			try {
-				timer_video.requestPictureInPicture();
+				set_up_picture_in_picture();
 			} catch (err) {
 				// pass
 			}
@@ -333,40 +308,9 @@ timer_button.addEventListener('click', () => {
 	});
 }, {once: true});
 
-to_canvas_img.addEventListener('load', () => {
-		timer_canvas_ctx.drawImage(to_canvas_img, 0, 0);
-});
-
-document.getElementById('timer-pip-button').addEventListener('click', () => {
-	if(!timer_started) {
-		start_timer();
-	} else {
-		timer_video.play();
-		timer_video.requestPictureInPicture();
-	}
-});
-
 {
 	const dropdowns = document.getElementsByClassName('dropdown-reveal');
 	for(let elem of dropdowns) {
 		elem.addEventListener('click', () => {elem.classList.toggle('dropdown-is-hidden');});
 	}
-}
-
-{
-	const content_wrapper = document.getElementById('content-wrapper');
-	const timer_wrapper = document.getElementById('timer-wrapper');
-	const media_query = matchMedia('(min-aspect-ratio: 4/3)');
-	window.addEventListener('resize', () => {
-		if(media_query.matches){
-				timer_wrapper.style.transform = `translate(${(600 * content_wrapper.offsetHeight / 675) * ((content_wrapper.offsetHeight / 675) - 1) / 2}px, ${content_wrapper.offsetHeight * (content_wrapper.offsetHeight / 675 - 1) / 2}px) scale(${content_wrapper.offsetHeight / 675})`; 
-				timer_wrapper.style.width = `${600 * content_wrapper.offsetHeight / 675}px`;
-				timer_wrapper.style.height = '';
-		} else {
-			timer_wrapper.style.transform = `translate(${(content_wrapper.offsetWidth - 600) / 2}px, ${(675 * content_wrapper.offsetWidth / 600) * ((content_wrapper.offsetWidth / 600) - 1) / 2}px) scale(${content_wrapper.offsetWidth / 600})`;
-			timer_wrapper.style.width = '600px';
-			timer_wrapper.style.height = `${675 * content_wrapper.offsetWidth / 600}px`;
-		}
-	});
-	window.dispatchEvent(new Event('resize'));
 }
