@@ -14,6 +14,7 @@ var break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_tim
 work_timer = false; // for alternating between work/break blocks
 work_timer_set_seconds = 25 * 60; // default
 break_timer_set_seconds = 5 * 60; // default
+const timer_button = document.getElementById('timer-button');
 const timer_video = document.createElement('video');
 const timer_canvas = document.createElement('canvas');
 timer_canvas.width = 600;
