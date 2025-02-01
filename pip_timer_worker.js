@@ -23,8 +23,9 @@ function start_timer() {
 }
 
 function draw_timer(timestamp) {
+	postMessage(performance.now());
 	timer_canvas_context.fillStyle = 'white';
-	timer_canvas_context.fillRect(0, 0, timer_canvas_context.width, timer_canvas_context.length);
+	timer_canvas_context.fillRect(0, 0, timer_canvas.width, timer_canvas.length);
 	timer_canvas_context.fillStyle = timer_break ? timer_colors.alt_dark : timer_colors.dark;
 	timer_canvas_context.roundRect(225 * timer_dimensions_factor, 50 * timer_dimensions_factor, 150 * timer_dimensions_factor, 50 * timer_dimensions_factor, [25 * timer_dimensions_factor]);
 	timer_canvas_context.fill();

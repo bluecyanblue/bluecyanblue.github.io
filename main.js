@@ -147,6 +147,11 @@ const pip_timer_worker = new Worker('pip_timer_worker.js');
 const offscreen_canvas = timer_canvas.transferControlToOffscreen();
 pip_timer_worker.postMessage({type: 'init', canvas: offscreen_canvas}, [offscreen_canvas]);
 pip_timer_worker.postMessage({type: 'color-change', colors: {light: '#eee', dim: '#888', dark: '#222', alt_light: '#ccb', alt_dim: '#bba', alt_dark: '#aa8'}});
+const log = document.getElementById('log');
+pip_timer_worker.addEventListener('message', (message) => {
+	log.textContent += message.data;
+	log.textContent += '\n';
+});
 
 {
 	const content_wrapper = document.getElementById('content-wrapper');
