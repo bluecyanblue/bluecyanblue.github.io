@@ -12,6 +12,39 @@
 		<nav style="position: relative"><h1 style="display: inline">⌛ TickTock</h1> <sup>*(working title) **(legally distinct from TikTok)</sup><a href="https://forms.gle/8sEqruahR8zN1kaM7" style="position: absolute; right: 1rem">Give feedback</a></nav>
 		<div id="content-wrapper">
 			<div id="timer-wrapper">
+				<svg id="timer-svg" version="1.1" width="600" height="675" xmlns="http://www.w3.org/2000/svg">
+					<style>
+						:root {
+							--accent-color-light: #eee;
+							--accent-color-dim: #888;
+							--accent-color-dark: #222;
+							--alt-accent-color-light: #ccb;
+							--alt-accent-color-dim: #bba;
+							--alt-accent-color-dark: #aa8;
+						}
+						.timer-outer {
+							fill: var(--accent-color-dark);
+						}
+						.timer-break .timer-outer{
+							fill: var(--alt-accent-color-dark);
+						}
+						.timer-inner {
+							fill: var(--accent-color-dim);
+						}
+						.timer-break .timer-inner {
+							fill: var(--alt-accent-color-dim);
+						}
+					</style>
+					<g id="in-svg-timer-wrapper">
+						<rect class="timer-bg" width="100%" height="100%" fill="white" />
+						<circle class="timer-outer" cx="300" cy="375" r="250"/>
+						<circle class="timer-inner" cx="300" cy="375" r="200"/>
+						<rect class="timer-outer" x="275" y="75" width="50" height="75"/>
+						<rect class="timer-outer" x="225" y="50" width="150" height="50" rx="25"/>
+						<path id ="timer-circle" d="M 300 175 A 200 200 0 1 1 300 175" stroke="white" fill="transparent" stroke-width="50"/>
+						<text id="timer-text" x="300" y="375" text-anchor="middle" dominant-baseline="middle" font-family="Bahnschrift, Arial Black, sans-serif" font-size="30" font-weight="bold" fill="white">-</text>
+					</g>
+				</svg>
 			</div>
 			<div id="options-wrapper">
 				<div id="timer-options">
