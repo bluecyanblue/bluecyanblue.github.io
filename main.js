@@ -11,6 +11,10 @@ function util_s_to_hmmss(s) {
 
 // issues currently:
 // timer not working
+function queue_frame(callback) {
+	setTimeout(() => {callback(performance.now())}, 0);
+}
+
 const in_svg_timer_wrapper = document.getElementById('in-svg-timer-wrapper');
 function start_timer() {
 	paused = false;
@@ -23,39 +27,19 @@ function start_timer() {
 	} else {
 		in_svg_timer_wrapper.classList.add('timer-break');
 	}
-	requestAnimationFrame((timestamp) => prev_timestamp = timestamp);
-	requestAnimationFrame(update_timer);
-	// timer_video.play();
-	// navigator.mediaSession.setActionHandler('play', () => {
-		// toggle_pause(false);
-		// timer_button.classList.remove('timer-button-paused');
-		// timer_video.play();
-		// if(!noise_muted) noise_generation_context.resume();
-	// });
-	// navigator.mediaSession.setActionHandler('pause', () => {
-		// toggle_pause(true);
-		// timer_button.classList.add('timer-button-paused');
-		// timer_video.pause();
-		// noise_generation_context.suspend();
-	// });
-	// navigator.mediaSession.setActionHandler('previoustrack', () => {
-		// timer_ms = 0;
-		// if(paused) toggle_pause(false);
-		// timer_button.classList.remove('timer-button-paused');
-		// timer_video.play();
-	// });
-	// navigator.mediaSession.setActionHandler('nexttrack', () => {
-		// timer_button.classList.remove('timer-button-paused');
-		// timer_video.play();
-		// start_timer();
-	// });
+	// requestAnimationFrame((timestamp) => prev_timestamp = timestamp);
+	// requestAnimationFrame(update_timer);
+	queue_frame((timestamp) => prev_timestamp = timestamp);
+	queue_frame(update_timer);
 }
 
 function toggle_pause(pause) {
 	paused = pause;
 	if(!paused) {
-		requestAnimationFrame((timestamp) => prev_timestamp = timestamp);
-		requestAnimationFrame(update_timer);
+		// requestAnimationFrame((timestamp) => prev_timestamp = timestamp);
+		// requestAnimationFrame(update_timer);
+		queue_frame((timestamp) => prev_timestamp = timestamp);
+		queue_frame(update_timer);
 	}
 }
 
@@ -82,7 +66,8 @@ function update_timer(timestamp) {
 	}
 	let url = to_canvas_serializer.serializeToString(timer_svg);
 	to_canvas_img.src = 'data:image/svg+xml; charset=utf8, ' + encodeURIComponent(url);
-	requestAnimationFrame(update_timer);
+	// requestAnimationFrame(update_timer);
+	queue_frame(update_timer);
 }
 
 {
@@ -217,6 +202,7 @@ to_canvas_img.addEventListener('load', () => {
 });
 const to_canvas_serializer = new XMLSerializer();
 timer_video.srcObject = timer_canvas.captureStream(30);
+
 // document.getElementById('timer-wrapper').append(timer_canvas);
 // const pip_timer_worker = new Worker('pip_timer_worker.js');
 // const offscreen_canvas = timer_canvas.transferControlToOffscreen();

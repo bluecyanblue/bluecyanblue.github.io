@@ -284,6 +284,6 @@ nav {
 	border-bottom-color: var(--accent-color-dark) !important;
 	color: var(--accent-color-light) !important;
 }
-.button-selected::after {
+.button-selected::before, .button-selected::after {
 	background-color: var(--accent-color-light) !important;
 }
