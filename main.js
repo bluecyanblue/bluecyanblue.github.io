@@ -11,11 +11,10 @@ function util_s_to_hmmss(s) {
 
 // issues currently:
 // timer not working
-// not even appended
-// video metadata not loaded
 
 {
 	const noise_buttons = [document.getElementById('white-noise-button'), document.getElementById('pink-noise-button'), document.getElementById('brown-noise-button'), document.getElementById('binaural-beats-button')]
+	const mute_button = document.getElementById('mute-button');
 	function start_noise(e) {
 		const noise_generation_context = new AudioContext();
 		noise_generation_context.suspend();
@@ -97,10 +96,6 @@ function util_s_to_hmmss(s) {
 			noise_buttons[i].addEventListener('click', generate_source_playing_function(audio_source_nodes[i]));
 		}
 		document.getElementById('binaural-beats-button').addEventListener('click', () => {update_oscillator_frequencies();})
-		document.getElementById('stop-noise-button').addEventListener('click', () => {
-			noise_muted = true;
-			noise_generation_context.suspend();
-		});
 		binaural_diff_range.addEventListener('change', update_oscillator_frequencies);
 		binaural_base_freq.addEventListener('change', update_oscillator_frequencies);
 		for(let i in noise_buttons) {
@@ -114,9 +109,19 @@ function util_s_to_hmmss(s) {
 			for(let j in noise_buttons) {
 				noise_buttons[j].classList.remove('button-selected');
 			}
+			mute_button.classList.remove('button-selected');
 			e.target.classList.add('button-selected');
 		});
 	}
+	mute_button.addEventListener('click', () => {
+		for(let j in noise_buttons) {
+			noise_buttons[j].classList.remove('button-selected');
+		}
+		mute_button.classList.add('button-selected');
+		noise_muted = true;
+		noise_generation_context.suspend();
+	});
+	mute_button.classList.add('button-selected');
 }
 
 timer_started = false;

@@ -257,7 +257,7 @@ nav {
 .dropdown-is-hidden ~ * {
 	display: none !important;
 }
-#stop-noise-button {
+#mute-button {
 	appearance: none;
 	display: block;
 	width: fit-content;
@@ -271,7 +271,7 @@ nav {
 	margin-right: var(--default-margin);
 	background-color: var(--accent-color-light);
 }
-#stop-noise-button::before {
+#mute-button::before {
 	display: inline-block;
 	width: var(--default-icon-width-and-height);
 	height: var(--default-icon-width-and-height);
