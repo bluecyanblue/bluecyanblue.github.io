@@ -32,7 +32,7 @@ pip_timer_worker.postMessage({type: 'color-change', colors: {light: '#eee', dim:
 	const media_query = matchMedia('(min-aspect-ratio: 4/3)');
 	window.addEventListener('resize', () => {
 		if(media_query.matches){
-				pip_timer_worker.postMessage({type: 'resize', dimensions_factor: content_wrapper.offsetHeight / 675}});
+				pip_timer_worker.postMessage({type: 'resize', dimensions_factor: content_wrapper.offsetHeight / 675});
 		} else {
 			pip_timer_worker.postMessage({type: 'resize', dimensions_factor: content_wrapper.offsetWidth / 600});
 		}
