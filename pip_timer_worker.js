@@ -1,6 +1,8 @@
 var timer_canvas, timer_canvas_context, paused, timer_dimensions, timer_durations, curr_duration, timer_ms, prev_timestamp, timer_break, timer_colors;
 paused = true;
 timer_break = true;
+curr_duration = 0;
+timer_ms = 0;
 
 function util_s_to_hmmss(s) {
 	let seconds = s % 60;
@@ -21,7 +23,6 @@ function start_timer() {
 }
 
 function draw_timer(timestamp) {
-	console.log('unless I am stupid, this should work');
 	timer_canvas_context.fillStyle = 'white';
 	timer_canvas_context.fillRect(0, 0, timer_canvas_context.width, timer_canvas_context.length);
 	timer_canvas_context.fillStyle = timer_break ? timer_colors.alt_dark : timer_colors.dark;
@@ -63,7 +64,6 @@ self.addEventListener('message', (message) => {
 		case 'init':
 			timer_canvas = message.data.canvas;
 			timer_canvas_context = timer_canvas.getContext('2d');
-			timer_ms = 0;
 			requestAnimationFrame((timestamp) => {prev_timestamp = timestamp});
 			requestAnimationFrame(draw_timer);
 			break;
