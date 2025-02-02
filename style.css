@@ -326,7 +326,7 @@ nav::after {
 	text-align: center;
 	font-size: 2rem;
 }
-.button-selected {
+.button-selected, .scroll-mutex-locked button {
 	background-color: var(--accent-color-dim) !important;
 	border-bottom-color: var(--accent-color-dark) !important;
 	color: var(--accent-color-light) !important;

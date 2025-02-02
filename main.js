@@ -149,15 +149,19 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 	update_hours_minutes_seconds_display(util_s_to_hmmss(work_timer_set_seconds).split(':').reverse());
 	let selected_work_timer = true; // select work/break
 	
+	let scroll_update_mutex = false; // for locking the interface during scrolling
+	
 	const switch_work_timer = document.createElement('button');
 	const switch_break_timer = document.createElement('button');
 	switch_work_timer.addEventListener('click', () => {
+		if(scroll_update_mutex) return;
 		selected_work_timer = true;
 		switch_work_timer.classList.add('button-selected');
 		switch_break_timer.classList.remove('button-selected');
 		update_hours_minutes_seconds_display(util_s_to_hmmss(work_timer_set_seconds).split(':').reverse());
 	});
 	switch_break_timer.addEventListener('click', () => {
+		if(scroll_update_mutex) return;
 		selected_work_timer = false;
 		switch_break_timer.classList.add('button-selected');
 		switch_work_timer.classList.remove('button-selected');
@@ -168,8 +172,6 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 	switch_break_timer.textContent = 'Break';
 	work_break_switch.append(switch_work_timer);
 	work_break_switch.append(switch_break_timer);
-	
-	let scroll_update_mutex = false;
 	
 	for(let i = 0; i< 3; i++) {
 		let current_unit_division;
@@ -191,6 +193,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 		
 		const factor = 3600 / (60 ** i);
 		increase_button.addEventListener('click', () => {
+			if(scroll_update_mutex) return;
 			if(selected_work_timer) {
 				work_timer_set_seconds += factor;
 			} else {
@@ -199,15 +202,8 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 			update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
 			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) > factor) decrease_button.classList.remove('button-selected');
 		});
-		switch_work_timer.addEventListener('click', () => {
-			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
-				decrease_button.classList.add('button-selected');
-			} else {
-				decrease_button.classList.remove('button-selected');
-			}
-		});
 		decrease_button.addEventListener('click', () => {
-			if( (selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) return;
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor || scroll_update_mutex) return;
 			if(selected_work_timer) {
 				work_timer_set_seconds -= factor;
 			} else {
@@ -215,6 +211,13 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 			}
 			update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
 			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) decrease_button.classList.add('button-selected');
+		});
+		switch_work_timer.addEventListener('click', () => {
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
+				decrease_button.classList.add('button-selected');
+			} else {
+				decrease_button.classList.remove('button-selected');
+			}
 		});
 		switch_break_timer.addEventListener('click', () => {
 			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
@@ -240,13 +243,13 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 				if(scroll_update_mutex && scroll_update_mutex != current_unit_division) return;
 				e.preventDefault();
 				scroll_update_mutex = current_unit_division;
+				work_break_switch.classList.add('scroll-mutex-locked');
+				controls_container.classList.add('scroll-mutex-locked');
 				if(scrolling_timeout) clearTimeout(scrolling_timeout);
 				let deltaY = - e.deltaY / 100;
 				if(current_value + cumulative_scroll + deltaY < 0) {
 					cumulative_scroll = -current_value;
-					decrease_button.classList.add('button-selected');
 				} else {
-					decrease_button.classList.remove('button-selected');
 					cumulative_scroll += deltaY;
 				}
 				let unit_display_val = Math.floor(current_value + cumulative_scroll).toString();
@@ -265,6 +268,8 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 					current_value = parseInt(hours_minutes_seconds_display[current_unit_division].textContent, 10);
 					scrolling_timeout = null;
 					scroll_update_mutex = false;
+					work_break_switch.classList.remove('scroll-mutex-locked');
+					controls_container.classList.remove('scroll-mutex-locked');
 					if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
 						decrease_button.classList.add('button-selected');
 					} else {
@@ -276,24 +281,25 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 		{
 			let current_value = parseInt(hours_minutes_seconds_display[current_unit_division].textContent, 10);
 			let interaction = null;
-			hours_minutes_seconds_display[current_unit_division].addEventListener('pointerdown', () => {
+			hours_minutes_seconds_display[current_unit_division].addEventListener('pointerdown', (e) => {
 				e.preventDefault();
 				function onpointermove_callback(e) {
 					e.preventDefault();
 					if(!interaction) interaction = {id: e.pointerId, y: e.pageY};
 					if(e.pointerId != interaction.id) return;
+					scroll_update_mutex = current_unit_division;
+					work_break_switch.classList.add('scroll-mutex-locked');
+					controls_container.classList.add('scroll-mutex-locked');
 					let unit_display_val = Math.max(0, Math.floor(current_value + ((interaction.y - e.pageY) / 10))).toString();
-					if(unit_display_val == '0') {
-						decrease_button.classList.add('button-selected');
-					} else {
-						decrease_button.classList.remove('button-selected');
-					}
 					if(unit_display_val.length == 1 && current_unit_division != 'hours') unit_display_val = '0' + unit_display_val;
 					hours_minutes_seconds_display[current_unit_division].textContent = unit_display_val;
 				}
 				function onpointerup_callback(e) {
 					e.preventDefault();
 					if(!interaction || e.pointerId != interaction.id) return;
+					scroll_update_mutex = false;
+					work_break_switch.classList.remove('scroll-mutex-locked');
+					controls_container.classList.remove('scroll-mutex-locked');
 					if(selected_work_timer) {
 						work_timer_set_seconds += Math.max(-current_value, Math.floor((interaction.y - e.pageY) / 10)) * factor;
 						work_timer_set_seconds = Math.max(1, work_timer_set_seconds);				
