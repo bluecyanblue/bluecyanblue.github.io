@@ -78,6 +78,9 @@ function set_up_picture_in_picture() {
 	if(!timer_started) timer_button.click();
 	const picture_in_picture_promise = timer_video.requestPictureInPicture();
 	toggle_pause(true);
+	timer_button.classList.add('timer-button-paused');
+	timer_video.pause();
+	navigator.mediaSession.playbackState = 'paused';
 	navigator.mediaSession.setActionHandler('play', () => {
 		toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
