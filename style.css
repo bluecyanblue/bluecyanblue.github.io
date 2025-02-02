@@ -7,6 +7,14 @@
 	--accent-color-dim: #888;
 	--accent-color-dark: #222;
 }
+@font-face {
+	font-family: Bahnschrift;
+	src:
+		local("Bahnschrift"),
+		url("media/bahnschrift.woff2") format("woff2"),
+		url("media/bahnschrift.woff") format("woff"),
+		url("media/bahnschrift.ttf") format("truetype");
+}
 body {
 	margin: 0;
 	font-family: Bahnschrift, "Franklin Gothic", Helvetica, sans-serif;
