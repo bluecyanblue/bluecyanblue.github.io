@@ -158,6 +158,18 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 	
 	let scroll_update_mutex = false; // for locking the interface during scrolling
 	
+	const duration_decrease_buttons = [];
+	
+	function update_locked_duration_buttons() {
+		for (i in duration_decrease_buttons) {
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
+				duration_decrease_buttons[i].classList.add('button-selected');
+			} else {
+				duration_decrease_buttons[i].classList.remove('button-selected');
+			}
+		}
+	}
+	
 	const switch_work_timer = document.createElement('button');
 	const switch_break_timer = document.createElement('button');
 	switch_work_timer.addEventListener('click', () => {
@@ -166,6 +178,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 		switch_work_timer.classList.add('button-selected');
 		switch_break_timer.classList.remove('button-selected');
 		update_hours_minutes_seconds_display(util_s_to_hmmss(work_timer_set_seconds).split(':').reverse());
+		update_locked_duration_buttons();
 	});
 	switch_break_timer.addEventListener('click', () => {
 		if(scroll_update_mutex) return;
@@ -173,6 +186,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 		switch_break_timer.classList.add('button-selected');
 		switch_work_timer.classList.remove('button-selected');
 		update_hours_minutes_seconds_display(util_s_to_hmmss(break_timer_set_seconds).split(':').reverse());
+		update_locked_duration_buttons();
 	});
 	switch_work_timer.classList.add('button-selected');
 	switch_work_timer.textContent = 'Work';
@@ -180,7 +194,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 	work_break_switch.append(switch_work_timer);
 	work_break_switch.append(switch_break_timer);
 	
-	for(let i = 0; i< 3; i++) {
+	for(let i = 0; i < 3; i++) {
 		let current_unit_division;
 		switch(i) {
 			case 0:
@@ -196,6 +210,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 		const unit_division_container = document.createElement('div');
 		const increase_button = document.createElement('button');
 		const decrease_button = document.createElement('button');
+		duration_decrease_buttons.push(decrease_button);
 		increase_button.classList.add('time-duration-controls-increase');
 		
 		const factor = 3600 / (60 ** i);
@@ -207,7 +222,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 				break_timer_set_seconds += factor;
 			}
 			update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
-			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) > factor) decrease_button.classList.remove('button-selected');
+			update_locked_duration_buttons();
 		});
 		decrease_button.addEventListener('click', () => {
 			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor || scroll_update_mutex) return;
@@ -217,23 +232,9 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 				break_timer_set_seconds -= factor;
 			}
 			update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
-			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) decrease_button.classList.add('button-selected');
+			update_locked_duration_buttons();
 		});
-		switch_work_timer.addEventListener('click', () => {
-			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
-				decrease_button.classList.add('button-selected');
-			} else {
-				decrease_button.classList.remove('button-selected');
-			}
-		});
-		switch_break_timer.addEventListener('click', () => {
-			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
-				decrease_button.classList.add('button-selected');
-			} else {
-				decrease_button.classList.remove('button-selected');
-			}
-		});
-		if(work_timer_set_seconds <= factor) decrease_button.classList.add('button-selected');
+		update_locked_duration_buttons();
 		
 		unit_division_container.append(increase_button);
 		unit_division_container.append(hours_minutes_seconds_display[current_unit_division]);
@@ -278,11 +279,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 					scroll_update_mutex = false;
 					work_break_switch.classList.remove('scroll-mutex-locked');
 					controls_container.classList.remove('scroll-mutex-locked');
-					if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
-						decrease_button.classList.add('button-selected');
-					} else {
-						decrease_button.classList.remove('button-selected');
-					}
+					update_locked_duration_buttons();
 				}, 1000); // update the actual value once scrolling is done
 			});	
 		}
@@ -320,11 +317,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 					update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
 					current_value = parseInt(hours_minutes_seconds_display[current_unit_division].textContent, 10);
 					interaction = null;
-					if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
-						decrease_button.classList.add('button-selected');
-					} else {
-						decrease_button.classList.remove('button-selected');
-					}
+					update_locked_duration_buttons();
 					window.removeEventListener('pointermove', onpointermove_callback);
 					window.removeEventListener('pointerup', onpointerup_callback);
 				}
