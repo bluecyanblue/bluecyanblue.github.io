@@ -339,6 +339,6 @@ nav::after {
 	border-bottom-color: var(--accent-color-dark) !important;
 	color: var(--accent-color-light) !important;
 }
-.button-selected::before, .button-selected::after {
+.button-selected::before, .button-selected::after, .scroll-mutex-locked button::after {
 	background-color: var(--accent-color-light) !important;
 }
