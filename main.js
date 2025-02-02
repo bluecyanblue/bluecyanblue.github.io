@@ -10,7 +10,6 @@ function util_s_to_hmmss(s) {
 }
 
 function queue_frame(callback) {
-	console.log('queued frame');
 	setTimeout(() => {callback(performance.now())}, 0);
 }
 
@@ -162,7 +161,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 	
 	function update_locked_duration_buttons() {
 		for (i in duration_decrease_buttons) {
-			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor) {
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= (3600 / (60 ** i))) {
 				duration_decrease_buttons[i].classList.add('button-selected');
 			} else {
 				duration_decrease_buttons[i].classList.remove('button-selected');
