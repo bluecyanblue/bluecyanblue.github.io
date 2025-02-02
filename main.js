@@ -426,7 +426,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 		(generate_source_playing_function(audio_source_nodes[noise_buttons.indexOf(e.target)]))();
 	}
 	for(let i in noise_buttons) {
-		noise_buttons[i].addEventListener('click', start_noise);
+		noise_buttons[i].addEventListener('click', start_noise, {once: true});
 		noise_buttons[i].addEventListener('click', (e) => {
 			for(let j in noise_buttons) {
 				noise_buttons[j].classList.remove('button-selected');
@@ -477,11 +477,11 @@ timer_button.addEventListener('click', () => {
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
 		navigator.mediaSession.playbackState = "playing";
-		
 	});
 	document.addEventListener('visibilitychange', () => {
 		if(document.hidden) {
 			timer_video.play();
+			navigator.mediaSession.playbackState = "playing";
 			try {
 				set_up_picture_in_picture();
 			} catch (err) {
