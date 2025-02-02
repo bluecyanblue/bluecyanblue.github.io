@@ -28,7 +28,7 @@ body * {
 		flex-direction: row;
 		justify-content: safe center;
 	}
-	#options-wrapper {
+	#side-wrapper {
 		width: 33vw;
 		overflow-y: auto;
 		scrollbar-gutter: stable;
@@ -58,10 +58,10 @@ nav {
 	background-color: var(--accent-color-light);
 	flex-grow: 1;
 }
-#timer-work-break-switch :nth-child(1) {
+#timer-work-break-switch button:nth-child(1) {
 	border-bottom-left-radius: var(--default-border-radius);
 }
-#timer-work-break-switch :nth-last-child(1) {
+#timer-work-break-switch button:nth-last-child(1) {
 	border-bottom-right-radius: var(--default-border-radius);
 }
 #timer-work-break-switch .button-selected {
@@ -91,10 +91,10 @@ nav {
 	border-bottom: var(--default-margin) solid var(--accent-color-dim);
 	background-color: var(--accent-color-light);
 }
-#timer-duration-controls :nth-child(1) button:nth-last-child(1) {
+#timer-duration-controls div:nth-child(1) button:nth-last-child(1) {
 	border-bottom-left-radius: var(--default-border-radius);
 }
-#timer-duration-controls :nth-last-child(1) button:nth-last-child(1) {
+#timer-duration-controls div:nth-last-child(1) button:nth-last-child(1) {
 	border-bottom-right-radius: var(--default-border-radius);
 }
 #timer-duration-controls * button::after {
@@ -102,7 +102,7 @@ nav {
 	width: var(--default-icon-width-and-height);
 	height: var(--default-icon-width-and-height);
 	content: "";
-	mask-image: url("graphics/triangle-arrow.svg");
+	mask-image: url("media/triangle-arrow.svg");
 	background-color: var(--accent-color-dim);
 	vertical-align: middle;
 }
@@ -139,14 +139,14 @@ nav {
 	width: var(--default-icon-width-and-height);
 	height: var(--default-icon-width-and-height);
 	content: "";
-	mask-image: url("graphics/pause.svg");
+	mask-image: url("media/pause.svg");
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
 #timer-button.timer-button-paused::after {
-	mask-image: url("graphics/play.svg");
+	mask-image: url("media/play.svg");
 }
-#timer-play-options > :nth-child(1) {
+#timer-play-options > button:nth-child(1) {
 	border-top-left-radius: var(--default-border-radius);
 	border-bottom-left-radius: var(--default-border-radius);
 }
@@ -155,11 +155,11 @@ nav {
 	width: var(--default-icon-width-and-height);
 	height: var(--default-icon-width-and-height);
 	content: "";
-	mask-image: url("graphics/reset.svg");
+	mask-image: url("media/reset.svg");
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
-#timer-play-options > :nth-last-child(2) {
+#timer-play-options > button:nth-last-child(2) {
 	border-top-right-radius: var(--default-border-radius);
 	border-bottom-right-radius: var(--default-border-radius);
 }
@@ -168,7 +168,7 @@ nav {
 	width: var(--default-icon-width-and-height);
 	height: var(--default-icon-width-and-height);
 	content: "";
-	mask-image: url("graphics/skip.svg");
+	mask-image: url("media/skip.svg");
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
@@ -180,7 +180,7 @@ nav {
 	width: var(--default-icon-width-and-height);
 	height: var(--default-icon-width-and-height);
 	content: "";
-	mask-image: url("graphics/picture-in-picture.svg");
+	mask-image: url("media/picture-in-picture.svg");
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
@@ -209,10 +209,10 @@ nav {
 	background-color: var(--accent-color-light);
 	flex-grow: 1;
 }
-#white-noise-options-inner > :nth-child(1) {
+#white-noise-options-inner > button:nth-child(1) {
 	border-bottom-left-radius: var(--default-border-radius);
 }
-#white-noise-options-inner > :nth-last-child(1) {
+#white-noise-options-inner > button:nth-last-child(1) {
 	border-bottom-right-radius: var(--default-border-radius);
 }
 #white-noise-options-inner .button-selected {
@@ -267,7 +267,8 @@ nav {
 	border-radius: var(--default-border-radius);
 	border-bottom: var(--default-margin) solid var(--accent-color-dim);
 	float: right;
-	margin-right: var(--default-margin);
+	margin: var(--default-margin);
+	margin-top: 0;
 	background-color: var(--accent-color-light);
 }
 #mute-button::before {
@@ -275,9 +276,48 @@ nav {
 	width: var(--default-icon-width-and-height);
 	height: var(--default-icon-width-and-height);
 	content: "";
-	mask-image: url("graphics/mute.svg");
+	mask-image: url("media/mute.svg");
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
+}
+#mute-button + * {
+	clear: both;
+}
+#reward-wrapper {
+	margin: var(--default-margin);
+	border-radius: var(--default-border-radius);
+	background-color: var(--accent-color-light);
+}
+#reward-wrapper p {
+	margin: 0;
+	padding: var(--default-padding);
+}
+#reward-wrapper button {
+	appearance: none;
+	display: block;
+	width: 100%;
+	text-align: center;
+	outline: none;
+	border: none;
+	padding: var(--default-padding);
+	border-top: var(--default-margin) solid white;
+	border-bottom: var(--default-margin) solid white;
+	background-color: var(--accent-color-light);
+}
+#reward-wrapper button:nth-last-child(1) {
+	border-bottom-right-radius: var(--default-border-radius);
+	border-bottom-left-radius: var(--default-border-radius);
+	border-bottom: var(--default-margin) solid var(--accent-color-dim);
+}
+#reward-type-switch-button::after {
+	content: "I'm a dog person.";
+}
+#reward-type-switch-button.reward-type-dog-person::after {
+	content: "I'm a cat person.";
+}
+#reward-icon-display {
+	text-align: center;
+	font-size: 2rem;
 }
 .button-selected {
 	background-color: var(--accent-color-dim) !important;

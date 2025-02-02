@@ -13,10 +13,9 @@ function queue_frame(callback) {
 	setTimeout(() => {callback(performance.now())}, 0);
 }
 
-const in_svg_timer_wrapper = document.getElementById('in-svg-timer-wrapper');
 function start_timer() {
-	paused = false;
 	timer_started = true;
+	paused = false;
 	work_timer = !work_timer;
 	seconds = work_timer ? work_timer_set_seconds : break_timer_set_seconds;
 	timer_ms = 0;
@@ -37,15 +36,16 @@ function toggle_pause(pause) {
 	}
 }
 
-const timer_svg = document.getElementById('timer-svg');
-const timer_circle = document.getElementById('timer-circle');
-const timer_text = document.getElementById('timer-text');
 function update_timer(timestamp) {
 	if(paused) return;
 	if(timer_ms >= seconds * 1000) {
 		start_timer();
 		return;
 	}
+	
+	if(work_timer) total_work_time += timestamp - prev_timestamp;
+	update_reward_display();
+	
 	timer_ms += timestamp - prev_timestamp;
 	prev_timestamp = timestamp;
 	let angle = ((timer_ms * 2 * Math.PI / 1000) / seconds) % (2 * Math.PI);
@@ -63,140 +63,15 @@ function update_timer(timestamp) {
 	queue_frame(update_timer);
 }
 
-{
-	const noise_buttons = [document.getElementById('white-noise-button'), document.getElementById('pink-noise-button'), document.getElementById('brown-noise-button'), document.getElementById('binaural-beats-button')]
-	const mute_button = document.getElementById('mute-button');
-	function start_noise(e) {
-		const noise_generation_context = new AudioContext();
-		noise_generation_context.suspend();
-
-		// noise
-		const white_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
-		const pink_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
-		const brown_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
-
-		const white_channel = white_noise_generation_buffer.getChannelData(0);
-		const pink_channel = pink_noise_generation_buffer.getChannelData(0);
-		const brown_channel = brown_noise_generation_buffer.getChannelData(0);
-		
-		// pinking variables
-		var pink_0, pink_1, pink_2, pink_3, pink_4, pink_5, pink_6;
-		pink_0 = pink_1 = pink_2 = pink_3 = pink_4 = pink_5 = pink_6 = 0.0;
-		
-		// browning variable
-		var brown_0 = 0.0;
-		
-		for(let i = 0; i < 10 * noise_generation_context.sampleRate; i++) {
-			white_channel[i] = 2 * Math.random() - 1;
-			
-			pink_0 = 0.99886 * pink_0 + white_channel[i] * 0.0555179;
-			pink_1 = 0.99332 * pink_1 + white_channel[i] * 0.0750759;
-			pink_2 = 0.96900 * pink_2 + white_channel[i] * 0.1538520;
-			pink_3 = 0.86650 * pink_3 + white_channel[i] * 0.3104856;
-			pink_4 = 0.55000 * pink_4 + white_channel[i] * 0.5329522;
-			pink_5 = -0.7616 * pink_5 - white_channel[i] * 0.0168980;
-			pink_channel[i] = (pink_0 + pink_1 + pink_2 + pink_3 + pink_4 + pink_5 + pink_6 + (white_channel[i] * 0.5362)) * 0.11;
-			pink_6 = white_channel[i] * 0.115926;
-			
-			brown_channel[i] = (brown_0 + (0.02 * white_channel[i])) / (1.02);
-			brown_0 = brown_channel[i];
-			brown_channel[i] = 3.5 * brown_channel[i];
-			
-		}
-		const white_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
-		const pink_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
-		const brown_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
-		white_noise_generation_buffer_source.buffer = white_noise_generation_buffer;
-		pink_noise_generation_buffer_source.buffer = pink_noise_generation_buffer;
-		brown_noise_generation_buffer_source.buffer = brown_noise_generation_buffer;
-		white_noise_generation_buffer_source.loop = true;
-		pink_noise_generation_buffer_source.loop = true;
-		brown_noise_generation_buffer_source.loop = true;
-		white_noise_generation_buffer_source.start();
-		pink_noise_generation_buffer_source.start();
-		brown_noise_generation_buffer_source.start();
-		
-		// binaural beats
-		const binaural_base_freq = document.getElementById('binaural-base-freq');
-		const oscillator_left = new OscillatorNode(noise_generation_context, {frequency: parseInt(binaural_base_freq.value, 10)});
-		const oscillator_right = new OscillatorNode(noise_generation_context, {frequency: parseInt(binaural_base_freq.value, 10)});
-		const binaural_diff_range = document.getElementById('binaural-diff-range');
-		const binaural_beats_source = new ChannelMergerNode(noise_generation_context, {numberOfInputs: 2});
-		oscillator_left.connect(binaural_beats_source, 0, 0);
-		oscillator_right.connect(binaural_beats_source, 0, 1);
-		oscillator_left.start();
-		oscillator_right.start();
-		
-		const audio_source_nodes = [white_noise_generation_buffer_source, pink_noise_generation_buffer_source, brown_noise_generation_buffer_source, binaural_beats_source];
-		function update_oscillator_frequencies() {
-			oscillator_left.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) + (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
-			oscillator_right.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) - (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
-		}
-		function generate_source_playing_function(source) {
-			return () => {
-				noise_muted = false;
-				for(let i in audio_source_nodes) {
-					audio_source_nodes[i].disconnect();
-				}
-				source.connect(noise_generation_context.destination);
-				noise_generation_context.resume();
-			};
-		}
-		for(let i in noise_buttons) {
-			noise_buttons[i].addEventListener('click', generate_source_playing_function(audio_source_nodes[i]));
-		}
-		document.getElementById('binaural-beats-button').addEventListener('click', () => {update_oscillator_frequencies();})
-		binaural_diff_range.addEventListener('change', update_oscillator_frequencies);
-		binaural_base_freq.addEventListener('change', update_oscillator_frequencies);
-		for(let i in noise_buttons) {
-			noise_buttons[i].removeEventListener('click', start_noise);
-		}
-		(generate_source_playing_function(audio_source_nodes[noise_buttons.indexOf(e.target)]))();
-	}
-	for(let i in noise_buttons) {
-		noise_buttons[i].addEventListener('click', start_noise);
-		noise_buttons[i].addEventListener('click', (e) => {
-			for(let j in noise_buttons) {
-				noise_buttons[j].classList.remove('button-selected');
-			}
-			mute_button.classList.remove('button-selected');
-			e.target.classList.add('button-selected');
-		});
-	}
-	mute_button.addEventListener('click', () => {
-		for(let j in noise_buttons) {
-			noise_buttons[j].classList.remove('button-selected');
-		}
-		mute_button.classList.add('button-selected');
-		noise_muted = true;
-		noise_generation_context.suspend();
-	});
-	mute_button.classList.add('button-selected');
+function update_reward_display() {
+	reward_work_time_display.textContent = util_s_to_hmmss(Math.floor(total_work_time / 1000));
+	let rewards_number = Math.floor((total_work_time / 1000) / 600) - rewards_claimed;
+	reward_number_display.textContent = rewards_number.toString() + (reward_type_dog_person ? ' woof(s)' : ' meow(s)');
+	reward_icon_display.textContent = (reward_type_dog_person ? '🐶' : '🐱').repeat(rewards_number);
 }
 
-timer_started = false;
-var break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused, noise_generation_context, noise_muted;
-noise_generation_context = null;
-noise_muted = true;
-work_timer = false; // for alternating between work/break blocks
-work_timer_set_seconds = 25 * 60; // default
-break_timer_set_seconds = 5 * 60; // default
-const timer_button = document.getElementById('timer-button');
-const timer_video = document.createElement('video');
-const timer_canvas = document.createElement('canvas');
-timer_canvas.width = 600;
-timer_canvas.height = 675;
-const timer_canvas_context = timer_canvas.getContext('2d');
-timer_canvas_context.fillStyle = 'white';
-timer_canvas_context.fillRect(0, 0, timer_canvas.width, timer_canvas.height);
-const to_canvas_img = document.createElement('img');
-to_canvas_img.addEventListener('load', () => {
-	timer_canvas_context.drawImage(to_canvas_img, 0, 0);
-});
-const to_canvas_serializer = new XMLSerializer();
-timer_video.srcObject = timer_canvas.captureStream(30);
-
 function set_up_picture_in_picture() {
+	if(!timer_started) start_timer();
 	timer_video.play();
 	timer_video.requestPictureInPicture();
 	navigator.mediaSession.setActionHandler('play', () => {
@@ -219,12 +94,47 @@ function set_up_picture_in_picture() {
 	});
 	navigator.mediaSession.setActionHandler('nexttrack', () => {
 		timer_button.classList.remove('timer-button-paused');
-		if(paused) toggle_pause(false);
 		timer_video.play();
 		start_timer();
 	});
 }
 
+var timer_started, break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused, noise_generation_context, noise_muted, total_work_time, rewards_claimed, reward_type_dog_person;
+timer_started = false;
+noise_generation_context = null;
+noise_muted = true;
+work_timer = false; // for alternating between work/break blocks
+work_timer_set_seconds = 25 * 60; // default
+break_timer_set_seconds = 5 * 60; // default
+
+total_work_time = 0;
+rewards_claimed = 0;
+reward_type_dog_person = false;
+const reward_work_time_display = document.getElementById('reward-work-time-display');
+const reward_number_display = document.getElementById('reward-number-display');
+const reward_icon_display = document.getElementById('reward-icon-display');
+
+const in_svg_timer_wrapper = document.getElementById('in-svg-timer-wrapper');
+const timer_button = document.getElementById('timer-button');
+
+const timer_svg = document.getElementById('timer-svg');
+const timer_circle = document.getElementById('timer-circle');
+const timer_text = document.getElementById('timer-text');
+
+// set up video element for picture-in-picture
+const timer_video = document.createElement('video');
+const timer_canvas = document.createElement('canvas');
+timer_canvas.width = parseInt(timer_svg.getAttribute('width'), 10);
+timer_canvas.height = parseInt(timer_svg.getAttribute('height'), 10);
+const timer_canvas_context = timer_canvas.getContext('2d');
+timer_canvas_context.fillStyle = 'white';
+timer_canvas_context.fillRect(0, 0, timer_canvas.width, timer_canvas.height);
+const to_canvas_img = document.createElement('img');
+to_canvas_img.addEventListener('load', () => {
+	timer_canvas_context.drawImage(to_canvas_img, 0, 0);
+});
+const to_canvas_serializer = new XMLSerializer();
+timer_video.srcObject = timer_canvas.captureStream(30);
 document.getElementById('timer-pip-button').addEventListener('click', set_up_picture_in_picture);
 
 {
@@ -405,6 +315,117 @@ document.getElementById('timer-pip-button').addEventListener('click', set_up_pic
 	}
 }
 
+{
+	const noise_buttons = [document.getElementById('white-noise-button'), document.getElementById('pink-noise-button'), document.getElementById('brown-noise-button'), document.getElementById('binaural-beats-button')]
+	const mute_button = document.getElementById('mute-button');
+	function start_noise(e) {
+		noise_generation_context = new AudioContext();
+		noise_generation_context.suspend();
+
+		// noise
+		const white_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+		const pink_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+		const brown_noise_generation_buffer = noise_generation_context.createBuffer(1, 10 * noise_generation_context.sampleRate, noise_generation_context.sampleRate);
+
+		const white_channel = white_noise_generation_buffer.getChannelData(0);
+		const pink_channel = pink_noise_generation_buffer.getChannelData(0);
+		const brown_channel = brown_noise_generation_buffer.getChannelData(0);
+		
+		// pinking variables
+		var pink_0, pink_1, pink_2, pink_3, pink_4, pink_5, pink_6;
+		pink_0 = pink_1 = pink_2 = pink_3 = pink_4 = pink_5 = pink_6 = 0.0;
+		
+		// browning variable
+		var brown_0 = 0.0;
+		
+		for(let i = 0; i < 10 * noise_generation_context.sampleRate; i++) {
+			white_channel[i] = 2 * Math.random() - 1;
+			
+			pink_0 = 0.99886 * pink_0 + white_channel[i] * 0.0555179;
+			pink_1 = 0.99332 * pink_1 + white_channel[i] * 0.0750759;
+			pink_2 = 0.96900 * pink_2 + white_channel[i] * 0.1538520;
+			pink_3 = 0.86650 * pink_3 + white_channel[i] * 0.3104856;
+			pink_4 = 0.55000 * pink_4 + white_channel[i] * 0.5329522;
+			pink_5 = -0.7616 * pink_5 - white_channel[i] * 0.0168980;
+			pink_channel[i] = (pink_0 + pink_1 + pink_2 + pink_3 + pink_4 + pink_5 + pink_6 + (white_channel[i] * 0.5362)) * 0.11;
+			pink_6 = white_channel[i] * 0.115926;
+			
+			brown_channel[i] = (brown_0 + (0.02 * white_channel[i])) / (1.02);
+			brown_0 = brown_channel[i];
+			brown_channel[i] = 3.5 * brown_channel[i];
+			
+		}
+		const white_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
+		const pink_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
+		const brown_noise_generation_buffer_source = new AudioBufferSourceNode(noise_generation_context);
+		white_noise_generation_buffer_source.buffer = white_noise_generation_buffer;
+		pink_noise_generation_buffer_source.buffer = pink_noise_generation_buffer;
+		brown_noise_generation_buffer_source.buffer = brown_noise_generation_buffer;
+		white_noise_generation_buffer_source.loop = true;
+		pink_noise_generation_buffer_source.loop = true;
+		brown_noise_generation_buffer_source.loop = true;
+		white_noise_generation_buffer_source.start();
+		pink_noise_generation_buffer_source.start();
+		brown_noise_generation_buffer_source.start();
+		
+		// binaural beats
+		const binaural_base_freq = document.getElementById('binaural-base-freq');
+		const oscillator_left = new OscillatorNode(noise_generation_context, {frequency: parseInt(binaural_base_freq.value, 10)});
+		const oscillator_right = new OscillatorNode(noise_generation_context, {frequency: parseInt(binaural_base_freq.value, 10)});
+		const binaural_diff_range = document.getElementById('binaural-diff-range');
+		const binaural_beats_source = new ChannelMergerNode(noise_generation_context, {numberOfInputs: 2});
+		oscillator_left.connect(binaural_beats_source, 0, 0);
+		oscillator_right.connect(binaural_beats_source, 0, 1);
+		oscillator_left.start();
+		oscillator_right.start();
+		
+		const audio_source_nodes = [white_noise_generation_buffer_source, pink_noise_generation_buffer_source, brown_noise_generation_buffer_source, binaural_beats_source];
+		function update_oscillator_frequencies() {
+			oscillator_left.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) + (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
+			oscillator_right.frequency.setValueAtTime(parseInt(binaural_base_freq.value, 10) - (parseInt(binaural_diff_range.value, 10) / 2), noise_generation_context.currentTime);
+		}
+		function generate_source_playing_function(source) {
+			return () => {
+				noise_muted = false;
+				for(let i in audio_source_nodes) {
+					audio_source_nodes[i].disconnect();
+				}
+				source.connect(noise_generation_context.destination);
+				noise_generation_context.resume();
+			};
+		}
+		for(let i in noise_buttons) {
+			noise_buttons[i].addEventListener('click', generate_source_playing_function(audio_source_nodes[i]));
+		}
+		document.getElementById('binaural-beats-button').addEventListener('click', () => {update_oscillator_frequencies();})
+		binaural_diff_range.addEventListener('change', update_oscillator_frequencies);
+		binaural_base_freq.addEventListener('change', update_oscillator_frequencies);
+		for(let i in noise_buttons) {
+			noise_buttons[i].removeEventListener('click', start_noise);
+		}
+		(generate_source_playing_function(audio_source_nodes[noise_buttons.indexOf(e.target)]))();
+	}
+	for(let i in noise_buttons) {
+		noise_buttons[i].addEventListener('click', start_noise);
+		noise_buttons[i].addEventListener('click', (e) => {
+			for(let j in noise_buttons) {
+				noise_buttons[j].classList.remove('button-selected');
+			}
+			mute_button.classList.remove('button-selected');
+			e.target.classList.add('button-selected');
+		});
+	}
+	mute_button.addEventListener('click', () => {
+		for(let j in noise_buttons) {
+			noise_buttons[j].classList.remove('button-selected');
+		}
+		mute_button.classList.add('button-selected');
+		noise_muted = true;
+		if (noise_generation_context) noise_generation_context.suspend();
+	});
+	mute_button.classList.add('button-selected');
+}
+
 timer_button.addEventListener('click', () => {
 	start_timer();
 	timer_button.classList.remove('timer-button-paused');
@@ -469,4 +490,34 @@ timer_button.addEventListener('click', () => {
 		}
 	});
 	window.dispatchEvent(new Event('resize'));
+}
+
+{
+	const reward_claim_button = document.getElementById('reward-claim-button');
+	const reward_type_switch_button = document.getElementById('reward-type-switch-button');
+	let reward_claim_mutex = false;
+	
+	const meow_sound = document.createElement('audio');
+	const woof_sound = document.createElement('audio');
+	meow_sound.src = 'media/meow.mp3';
+	woof_sound.src = 'media/woof.mp3';
+	meow_sound.addEventListener('ended', () => {reward_claim_mutex = false});
+	woof_sound.addEventListener('ended', () => {reward_claim_mutex = false});
+	
+	reward_claim_button.addEventListener('click', () => {
+		if(Math.floor((total_work_time / 1000) / 5) <= rewards_claimed || reward_claim_mutex) return;
+		reward_claim_mutex = true;
+		rewards_claimed += 1;
+		if(reward_type_dog_person) {
+			woof_sound.play();
+		} else {
+			meow_sound.play();
+		}
+		update_reward_display();
+	});
+	reward_type_switch_button.addEventListener('click', () => {
+		reward_type_dog_person = !reward_type_dog_person;
+		reward_type_switch_button.classList.toggle('reward-type-dog-person');
+		update_reward_display();
+	});
 }
