@@ -66,7 +66,7 @@ function update_timer(timestamp) {
 function update_reward_display() {
 	reward_work_time_display.textContent = util_s_to_hmmss(Math.floor(total_work_time / 1000));
 	let rewards_number = Math.floor((total_work_time / 1000) / 600) - rewards_claimed;
-	reward_number_display.textContent = rewards_number.toString() + (reward_type_dog_person ? ' woof(s)' : ' meow(s)');
+	reward_number_display.textContent = `${rewards_number} ${reward_type_dog_person ? 'woof(s)' : 'meow(s)'} (${util_s_to_hmmss(600 - (Math.floor(total_work_time / 1000) % 600))} until next reward)`;
 	reward_icon_display.textContent = (reward_type_dog_person ? '🐶' : '🐱').repeat(rewards_number);
 }
 
