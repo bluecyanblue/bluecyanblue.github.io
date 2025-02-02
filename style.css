@@ -9,7 +9,7 @@
 }
 body {
 	margin: 0;
-	font-family: Bahnschrift, "Trebuchet MS", sans-serif;
+	font-family: Bahnschrift, "Franklin Gothic", Helvetica, sans-serif;
 	color: var(--accent-color-dark);
 }
 body * {
