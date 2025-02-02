@@ -98,9 +98,6 @@ nav {
 	border-bottom-right-radius: var(--default-border-radius);
 }
 #timer-duration-controls * button::after {
-	display: inline-block;
-	width: var(--default-icon-width-and-height);
-	height: var(--default-icon-width-and-height);
 	content: "";
 	mask-image: url("media/triangle-arrow.svg");
 	background-color: var(--accent-color-dim);
