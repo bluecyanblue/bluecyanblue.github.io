@@ -36,8 +36,8 @@ function toggle_pause(pause) {
 	}
 }
 
-function update_timer(timestamp) {
-	if(paused) return;
+function internal_update_timer(timestamp, curr_paused) { // internally pass in paused to avoid race condition
+	if(curr_paused) return;
 	if(timer_ms >= seconds * 1000) {
 		start_timer();
 		return;
@@ -63,6 +63,10 @@ function update_timer(timestamp) {
 	queue_frame(update_timer);
 }
 
+function update_timer(timestamp) {
+	internal_update_timer(timestamp, paused);
+}
+
 function update_reward_display() {
 	reward_work_time_display.textContent = util_s_to_hmmss(Math.floor(total_work_time / 1000));
 	let rewards_number = Math.floor((total_work_time / 1000) / 600) - rewards_claimed;
@@ -72,20 +76,20 @@ function update_reward_display() {
 
 function set_up_picture_in_picture() {
 	if(!timer_started) timer_button.click();
-	timer_video.requestPictureInPicture();
-	timer_video.play();
+	const picture_in_picture_promise = timer_video.requestPictureInPicture();
+	toggle_pause(true);
 	navigator.mediaSession.setActionHandler('play', () => {
 		toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
-		navigator.mediaSession.playbackState = "playing";
+		navigator.mediaSession.playbackState = 'playing';
 		if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 	});
 	navigator.mediaSession.setActionHandler('pause', () => {
 		toggle_pause(true);
 		timer_button.classList.add('timer-button-paused');
 		timer_video.pause();
-		navigator.mediaSession.playbackState = "paused";
+		navigator.mediaSession.playbackState = 'paused';
 		if(noise_generation_context) noise_generation_context.suspend();
 	});
 	navigator.mediaSession.setActionHandler('previoustrack', () => {
@@ -93,7 +97,7 @@ function set_up_picture_in_picture() {
 		if(paused) toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
-		navigator.mediaSession.playbackState = "playing";
+		navigator.mediaSession.playbackState = 'playing';
 		if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 	});
 	navigator.mediaSession.setActionHandler('nexttrack', () => {
@@ -101,9 +105,10 @@ function set_up_picture_in_picture() {
 		if(paused) toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
-		navigator.mediaSession.playbackState = "playing";
+		navigator.mediaSession.playbackState = 'playing';
 		if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 	});
+	return picture_in_picture_promise;
 }
 
 var timer_started, break_timer_set_seconds, work_timer_set_seconds, seconds, timer_ms, prev_timestamp, prev_timer_text_chars, work_timer, paused, noise_generation_context, noise_muted, total_work_time, rewards_claimed, reward_type_dog_person;
@@ -446,13 +451,13 @@ timer_button.addEventListener('click', () => {
 			toggle_pause(false);
 			timer_button.classList.remove('timer-button-paused');
 			timer_video.play();
-			navigator.mediaSession.playbackState = "playing";
+			navigator.mediaSession.playbackState = 'playing';
 			if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 		} else {
 			toggle_pause(true);
 			timer_button.classList.add('timer-button-paused');
 			timer_video.pause();
-			navigator.mediaSession.playbackState = "paused";
+			navigator.mediaSession.playbackState = 'paused';
 			if(noise_generation_context) noise_generation_context.suspend();
 		}
 	});
@@ -461,29 +466,48 @@ timer_button.addEventListener('click', () => {
 		if(paused) toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
-		navigator.mediaSession.playbackState = "playing";
+		navigator.mediaSession.playbackState = 'playing';
 	});
 	document.getElementById('timer-skip-button').addEventListener('click', () => {
 		timer_ms = seconds * 1000;
 		if(paused) toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
-		navigator.mediaSession.playbackState = "playing";
+		navigator.mediaSession.playbackState = 'playing';
 	});
 	document.addEventListener('visibilitychange', () => {
+		if(document.pictureInPictureElement) return;
 		if(document.hidden) {
 			timer_video.play();
-			navigator.mediaSession.playbackState = "playing";
-			try {
-				set_up_picture_in_picture();
-			} catch (err) {
-				// pass
-			}
+			navigator.mediaSession.playbackState = 'playing';
+			set_up_picture_in_picture().catch((err) => {/* pass */});
 		}
 	});
 }, {once: true});
 
-document.getElementById('timer-pip-button').addEventListener('click', set_up_picture_in_picture);
+document.getElementById('timer-pip-button').addEventListener('click', () => {
+	set_up_picture_in_picture().catch((err) => {
+		let error_message;
+		switch(err.name) {
+			case 'NotSupportedError':
+				error_message = 'Not supported';
+				break;
+			case 'SecurityError':
+				error_message = 'Blocked by permissions/security';
+				break;
+			case 'InvalidStateError':
+				error_message = 'Unable to load video/player';
+				break;
+			case 'NotAllowedError':
+				error_message = 'Unable to register user permission';
+				break;
+			default:
+				error_message = 'Unknown error';
+				break;
+		}
+		alert('Couldn\'t set up Picture-in-Picture mode: ' + error_message);
+	});
+});
 
 {
 	const dropdowns = document.getElementsByClassName('dropdown-reveal');
