@@ -105,6 +105,9 @@ nav::after {
 }
 #timer-duration-controls * button::after {
 	content: "";
+	display: inline-block;
+	width: var(--default-icon-width-and-height);
+	height: var(--default-icon-width-and-height);
 	mask-image: url("media/triangle-arrow.svg");
 	background-color: var(--accent-color-dim);
 	vertical-align: middle;
