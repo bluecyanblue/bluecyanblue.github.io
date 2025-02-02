@@ -242,6 +242,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 				e.preventDefault();
 				if(scroll_update_mutex && scroll_update_mutex != current_unit_division) return;
 				e.preventDefault();
+				if(!scroll_update_mutex) current_value = parseInt(hours_minutes_seconds_display[current_unit_division].textContent, 10);
 				scroll_update_mutex = current_unit_division;
 				work_break_switch.classList.add('scroll-mutex-locked');
 				controls_container.classList.add('scroll-mutex-locked');
@@ -283,6 +284,8 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 			let interaction = null;
 			hours_minutes_seconds_display[current_unit_division].addEventListener('pointerdown', (e) => {
 				e.preventDefault();
+				if(scroll_update_mutex) return;
+				current_value = parseInt(hours_minutes_seconds_display[current_unit_division].textContent, 10);
 				function onpointermove_callback(e) {
 					e.preventDefault();
 					if(!interaction) interaction = {id: e.pointerId, y: e.pageY};
