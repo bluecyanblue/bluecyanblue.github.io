@@ -73,18 +73,20 @@ function update_reward_display() {
 
 function set_up_picture_in_picture() {
 	if(!timer_started) timer_button.click();
-	timer_video.play();
 	timer_video.requestPictureInPicture();
+	timer_video.play();
 	navigator.mediaSession.setActionHandler('play', () => {
 		toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
+		navigator.mediaSession.playbackState = "playing";
 		if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 	});
 	navigator.mediaSession.setActionHandler('pause', () => {
 		toggle_pause(true);
 		timer_button.classList.add('timer-button-paused');
 		timer_video.pause();
+		navigator.mediaSession.playbackState = "paused";
 		if(noise_generation_context) noise_generation_context.suspend();
 	});
 	navigator.mediaSession.setActionHandler('previoustrack', () => {
@@ -92,11 +94,16 @@ function set_up_picture_in_picture() {
 		if(paused) toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
+		navigator.mediaSession.playbackState = "playing";
+		if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 	});
 	navigator.mediaSession.setActionHandler('nexttrack', () => {
+		timer_ms = seconds * 1000;
+		if(paused) toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
-		timer_ms = seconds * 1000;
+		navigator.mediaSession.playbackState = "playing";
+		if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 	});
 }
 
@@ -447,11 +454,13 @@ timer_button.addEventListener('click', () => {
 			toggle_pause(false);
 			timer_button.classList.remove('timer-button-paused');
 			timer_video.play();
+			navigator.mediaSession.playbackState = "playing";
 			if(!noise_muted && noise_generation_context) noise_generation_context.resume();
 		} else {
 			toggle_pause(true);
 			timer_button.classList.add('timer-button-paused');
 			timer_video.pause();
+			navigator.mediaSession.playbackState = "paused";
 			if(noise_generation_context) noise_generation_context.suspend();
 		}
 	});
@@ -460,12 +469,14 @@ timer_button.addEventListener('click', () => {
 		if(paused) toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
+		navigator.mediaSession.playbackState = "playing";
 	});
 	document.getElementById('timer-skip-button').addEventListener('click', () => {
-		timer_button.classList.remove('timer-button-paused');
-		if(paused) toggle_pause(false);
-		timer_video.play();
 		timer_ms = seconds * 1000;
+		if(paused) toggle_pause(false);
+		timer_button.classList.remove('timer-button-paused');
+		timer_video.play();
+		navigator.mediaSession.playbackState = "playing";
 		
 	});
 	document.addEventListener('visibilitychange', () => {
