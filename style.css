@@ -120,6 +120,7 @@ nav::after {
 	margin: 0.5rem 0;
 	-webkit-user-select: none;
 	user-select: none;
+	touch-action: none;
 }
 #timer-play-options {
 	display: flex;

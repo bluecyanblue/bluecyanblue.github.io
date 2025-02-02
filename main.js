@@ -10,6 +10,7 @@ function util_s_to_hmmss(s) {
 }
 
 function queue_frame(callback) {
+	console.log('queued frame');
 	setTimeout(() => {callback(performance.now())}, 0);
 }
 
@@ -71,7 +72,7 @@ function update_reward_display() {
 }
 
 function set_up_picture_in_picture() {
-	if(!timer_started) start_timer();
+	if(!timer_started) timer_button.click();
 	timer_video.play();
 	timer_video.requestPictureInPicture();
 	navigator.mediaSession.setActionHandler('play', () => {
@@ -95,7 +96,7 @@ function set_up_picture_in_picture() {
 	navigator.mediaSession.setActionHandler('nexttrack', () => {
 		timer_button.classList.remove('timer-button-paused');
 		timer_video.play();
-		start_timer();
+		timer_ms = seconds * 1000;
 	});
 }
 
@@ -135,7 +136,6 @@ to_canvas_img.addEventListener('load', () => {
 });
 const to_canvas_serializer = new XMLSerializer();
 timer_video.srcObject = timer_canvas.captureStream(30);
-document.getElementById('timer-pip-button').addEventListener('click', set_up_picture_in_picture);
 
 {
 	const work_break_switch = document.getElementById('timer-work-break-switch');
@@ -236,6 +236,7 @@ document.getElementById('timer-pip-button').addEventListener('click', set_up_pic
 			let current_value = parseInt(hours_minutes_seconds_display[current_unit_division].textContent, 10);
 			let scrolling_timeout = null;
 			hours_minutes_seconds_display[current_unit_division].addEventListener('wheel', (e) => {
+				e.preventDefault();
 				if(scroll_update_mutex && scroll_update_mutex != current_unit_division) return;
 				e.preventDefault();
 				scroll_update_mutex = current_unit_division;
@@ -276,7 +277,9 @@ document.getElementById('timer-pip-button').addEventListener('click', set_up_pic
 			let current_value = parseInt(hours_minutes_seconds_display[current_unit_division].textContent, 10);
 			let interaction = null;
 			hours_minutes_seconds_display[current_unit_division].addEventListener('pointerdown', () => {
+				e.preventDefault();
 				function onpointermove_callback(e) {
+					e.preventDefault();
 					if(!interaction) interaction = {id: e.pointerId, y: e.pageY};
 					if(e.pointerId != interaction.id) return;
 					let unit_display_val = Math.max(0, Math.floor(current_value + ((interaction.y - e.pageY) / 10))).toString();
@@ -289,6 +292,7 @@ document.getElementById('timer-pip-button').addEventListener('click', set_up_pic
 					hours_minutes_seconds_display[current_unit_division].textContent = unit_display_val;
 				}
 				function onpointerup_callback(e) {
+					e.preventDefault();
 					if(!interaction || e.pointerId != interaction.id) return;
 					if(selected_work_timer) {
 						work_timer_set_seconds += Math.max(-current_value, Math.floor((interaction.y - e.pageY) / 10)) * factor;
@@ -452,7 +456,7 @@ timer_button.addEventListener('click', () => {
 		timer_button.classList.remove('timer-button-paused');
 		if(paused) toggle_pause(false);
 		timer_video.play();
-		start_timer();
+		timer_ms = seconds * 1000;
 		
 	});
 	document.addEventListener('visibilitychange', () => {
@@ -466,6 +470,8 @@ timer_button.addEventListener('click', () => {
 		}
 	});
 }, {once: true});
+
+document.getElementById('timer-pip-button').addEventListener('click', set_up_picture_in_picture);
 
 {
 	const dropdowns = document.getElementsByClassName('dropdown-reveal');
