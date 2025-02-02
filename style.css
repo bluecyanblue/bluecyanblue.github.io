@@ -39,6 +39,11 @@ nav {
 	padding: 1rem;
 	margin-bottom: 2rem;
 }
+nav::after {
+	content: "";
+	display: block;
+	clear: both;
+}
 #timer-work-break-switch {
 	display: flex;
 	flex-direction: row;
