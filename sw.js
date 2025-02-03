@@ -23,7 +23,7 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-	e.respondWith(async () => {
+	const myfunc = async () => {
 		const networkResource = await fetch(e.request);
 		if(networkResource) {
 			(await caches.open('v1')).put(e.request, networkResource.clone());
@@ -34,5 +34,6 @@ self.addEventListener('fetch', (e) => {
 		console.log(typeof cachedResource);
 		if(cachedResource) return cachedResource;
 		return new Response('Resource not available', {status: 408, headers: {'Content-Type': 'text-plain'}});
-	});
+	};
+	e.respondWith(myfunc);
 });
