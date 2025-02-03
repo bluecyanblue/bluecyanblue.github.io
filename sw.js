@@ -33,6 +33,6 @@ self.addEventListener('fetch', (e) => {
 		const cachedResource = await caches.match(e.request);
 		console.log(cachedResource);
 		if(cachedResource) return cachedResource;
-		return new Response('Resource not available', {status: 408, headers: {'Content-Type': 'text-plain'}});
+		return new Response('Resource not available', {status: 408, headers: {'Content-Type': 'text/plain'}});
 	});
 });
