@@ -335,7 +335,10 @@ nav::after {
 #reward-wrapper {
 	margin: var(--default-margin);
 	border-radius: var(--default-border-radius);
+}
+#reward-wrapper * {
 	background-color: var(--accent-color-light);
+	
 }
 #reward-wrapper p {
 	margin: 0;
@@ -349,14 +352,12 @@ nav::after {
 	outline: none;
 	border: none;
 	padding: var(--default-padding);
-	border-top: var(--default-margin) solid white;
-	border-bottom: var(--default-margin) solid white;
-	background-color: var(--accent-color-light);
+	margin: var(--default-margin) 0;
+	border-bottom: var(--default-margin) solid var(--accent-color-dim);
 }
 #reward-wrapper button:nth-last-child(1) {
 	border-bottom-right-radius: var(--default-border-radius);
 	border-bottom-left-radius: var(--default-border-radius);
-	border-bottom: var(--default-margin) solid var(--accent-color-dim);
 }
 #reward-type-switch-button::after {
 	content: "I'm a dog person.";
