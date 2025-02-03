@@ -1,3 +1,5 @@
+navigator.serviceWorker.register('sw.js');
+
 function util_s_to_hmmss(s) {
 	let seconds = s % 60;
 	s -= seconds;
