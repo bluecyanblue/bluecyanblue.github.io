@@ -15,7 +15,6 @@ function queue_frame(callback) {
 
 function start_timer() {
 	timer_started = true;
-	paused = false;
 	work_timer = !work_timer;
 	seconds = work_timer ? work_timer_set_seconds : break_timer_set_seconds;
 	timer_ms = 0;
@@ -24,8 +23,7 @@ function start_timer() {
 	} else {
 		in_svg_timer_wrapper.classList.add('timer-break');
 	}
-	queue_frame((timestamp) => prev_timestamp = timestamp);
-	queue_frame(update_timer);
+	toggle_pause(false);
 }
 
 function toggle_pause(pause) {
@@ -77,10 +75,11 @@ function update_reward_display() {
 function set_up_picture_in_picture() {
 	if(!timer_started) timer_button.click();
 	const picture_in_picture_promise = timer_video.requestPictureInPicture();
-	toggle_pause(true);
-	timer_button.classList.add('timer-button-paused');
-	timer_video.pause();
-	navigator.mediaSession.playbackState = 'paused';
+	// you have to unpause, pause, and unpause the video or else the pause/play button breaks
+	timer_video.play().then(() => {
+		timer_video.pause();
+		timer_video.play();
+	});	
 	navigator.mediaSession.setActionHandler('play', () => {
 		toggle_pause(false);
 		timer_button.classList.remove('timer-button-paused');
@@ -449,6 +448,7 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 timer_button.addEventListener('click', () => {
 	start_timer();
 	timer_button.classList.remove('timer-button-paused');
+	navigator.mediaSession.playbackState = 'playing';
 	timer_button.addEventListener('click', () => {
 		if(paused) {
 			toggle_pause(false);
