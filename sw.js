@@ -23,17 +23,16 @@ self.addEventListener('install', (e) => {
 });
 
 self.addEventListener('fetch', (e) => {
-	const myfunc = async () => {
+	e.respondWith(async () => {
 		const networkResource = await fetch(e.request);
 		if(networkResource) {
 			(await caches.open('v1')).put(e.request, networkResource.clone());
-			console.log(typeof networkResource);
+			console.log(networkResource);
 			return networkResource;
 		}
 		const cachedResource = await caches.match(e.request);
-		console.log(typeof cachedResource);
+		console.log(cachedResource);
 		if(cachedResource) return cachedResource;
 		return new Response('Resource not available', {status: 408, headers: {'Content-Type': 'text-plain'}});
-	};
-	e.respondWith(myfunc);
+	};);
 });
