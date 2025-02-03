@@ -53,12 +53,9 @@ nav {
 }
 nav > * {
 	padding-right: var(--default-margin);
-	border-right: 0.125rem solid var(--accent-color-dim);
+	border-left: 0.125rem solid var(--accent-color-dim);
 	display: block;
 	margin: 0;
-}
-nav > h1 {
-	margin-right: auto;
 }
 nav > p::before {
 	display: inline-block;
@@ -70,17 +67,18 @@ nav > p::before {
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
+nav > :nth-child(1) {
+	border: none;
+}
+nav > :nth-last-child(1) {
+	margin-left: auto;
+	border: none;
+}
 nav::after {
 	content: "";
 	display: block;
 	min-height: 1px;
 	clear: both;
-}
-nav > :nth-child(1) {
-	border: none;
-}
-nav > :nth-last-child(1) {
-	border: none;
 }
 #timer-work-break-switch {
 	display: flex;

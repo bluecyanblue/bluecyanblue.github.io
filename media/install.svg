@@ -2,5 +2,5 @@
 	<rect width="20" height="20" fill="black"/>
 	<rect x="9" y="0" width="2" height="16" fill="white" rx="1"/>
 	<path d="M 3 9 L 10 15 L 17 9" fill="transparent" stroke="white" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-	<rect x="0" y="16" width="20" height="4" fill="white" rx="1"/>
+	<rect x="0" y="16" width="20" height="4" fill="white" rx="2"/>
 </svg>
