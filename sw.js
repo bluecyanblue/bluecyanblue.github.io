@@ -34,5 +34,5 @@ self.addEventListener('fetch', (e) => {
 		console.log(cachedResource);
 		if(cachedResource) return cachedResource;
 		return new Response('Resource not available', {status: 408, headers: {'Content-Type': 'text-plain'}});
-	};);
+	});
 });
