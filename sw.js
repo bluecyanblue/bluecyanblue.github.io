@@ -27,11 +27,9 @@ self.addEventListener('fetch', (e) => {
 		const networkResource = await fetch(e.request);
 		if(networkResource) {
 			(await caches.open('v1')).put(e.request, networkResource.clone());
-			console.log(networkResource);
 			return networkResource;
 		}
 		const cachedResource = await caches.match(e.request);
-		console.log(cachedResource);
 		if(cachedResource) return cachedResource;
 		return new Response('Resource not available', {status: 408, headers: {'Content-Type': 'text/plain'}});
 	})());
