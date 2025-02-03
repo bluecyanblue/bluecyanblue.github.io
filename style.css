@@ -52,7 +52,7 @@ nav {
 	margin-bottom: 2rem;
 }
 nav > * {
-	padding-right: var(--default-margin);
+	padding: 0 var(--default-margin);
 	border-left: 0.125rem solid var(--accent-color-dim);
 	display: block;
 	margin: 0;
