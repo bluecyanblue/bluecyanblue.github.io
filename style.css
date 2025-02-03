@@ -2,7 +2,7 @@
 	--default-padding: 0.5rem;
 	--default-margin: 0.25rem;
 	--default-border-radius: var(--default-padding);
-	--default-icon-width-and-height: 20px;
+	--default-icon-width-and-height: 5vw;
 	--accent-color-light: #eee;
 	--accent-color-dim: #888;
 	--accent-color-dark: #222;
@@ -19,15 +19,21 @@ body {
 	margin: 0;
 	font-family: Bahnschrift, "Franklin Gothic", Helvetica, sans-serif;
 	color: var(--accent-color-dark);
+	font-size: 3.3vw;
 }
 body * {
 	font-family: inherit;
+	font-size: inherit;
 }
 @media (min-aspect-ratio: 4/3) {
+	:root {
+		--default-icon-width-and-height: 20px;
+	}
 	body {
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
+		font-size: unset;
 	}
 	#content-wrapper {
 		flex-grow: 1;
@@ -52,7 +58,7 @@ nav {
 	margin-bottom: 2rem;
 }
 nav > * {
-	padding: 0 var(--default-margin);
+	/* padding: 0 var(--default-margin); */
 	border-left: 0.125rem solid var(--accent-color-dim);
 	display: block;
 	margin: 0;
@@ -64,6 +70,7 @@ nav > p::before {
 	content: "";
 	mask-image: url("media/install.svg");
 	mask-mode: luminance;
+	mask-size: cover;
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
@@ -145,6 +152,7 @@ nav::after {
 	height: var(--default-icon-width-and-height);
 	mask-image: url("media/triangle-arrow.svg");
 	mask-mode: luminance;
+	mask-size: cover;
 	background-color: var(--accent-color-dim);
 	vertical-align: middle;
 }
@@ -184,12 +192,14 @@ nav::after {
 	content: "";
 	mask-image: url("media/pause.svg");
 	mask-mode: luminance;
+	mask-size: cover;
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
 #timer-button.timer-button-paused::after {
 	mask-image: url("media/play.svg");
 	mask-mode: luminance;
+	mask-size: cover;
 }
 #timer-play-options > button:nth-child(1) {
 	border-top-left-radius: var(--default-border-radius);
@@ -202,6 +212,7 @@ nav::after {
 	content: "";
 	mask-image: url("media/reset.svg");
 	mask-mode: luminance;
+	mask-size: cover;
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
@@ -216,6 +227,7 @@ nav::after {
 	content: "";
 	mask-image: url("media/skip.svg");
 	mask-mode: luminance;
+	mask-size: cover;
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
@@ -229,6 +241,7 @@ nav::after {
 	content: "";
 	mask-image: url("media/picture-in-picture.svg");
 	mask-mode: luminance;
+	mask-size: cover;
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
@@ -326,6 +339,7 @@ nav::after {
 	content: "";
 	mask-image: url("media/mute.svg");
 	mask-mode: luminance;
+	mask-size: cover;
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
