@@ -4,7 +4,7 @@ self.addEventListener('install', (e) => {
 			'/',
 			'/index.html',
 			'/main.js',
-			'/style.js',
+			'/style.css',
 			'/media/bahnschrift.ttf',
 			'/media/bahnschrift.woff',
 			'/media/bahnschrift.woff2',
