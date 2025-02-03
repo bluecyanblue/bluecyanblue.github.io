@@ -1,5 +1,5 @@
 self.addEventListener('install', (e) => {
-	e.waitUntil(async () => {
+	e.waitUntil((async () => {
 		(await caches.open('v1')).addAll([
 			'/',
 			'/index.html',
@@ -19,11 +19,11 @@ self.addEventListener('install', (e) => {
 			'/media/meow.mp3',
 			'/media/woof.mp3',
 		]);
-	});
+	})());
 });
 
 self.addEventListener('fetch', (e) => {
-	e.respondWith(async () => {
+	e.respondWith((async () => {
 		const networkResource = await fetch(e.request);
 		if(networkResource) {
 			(await caches.open('v1')).put(e.request, networkResource.clone());
@@ -34,5 +34,5 @@ self.addEventListener('fetch', (e) => {
 		console.log(cachedResource);
 		if(cachedResource) return cachedResource;
 		return new Response('Resource not available', {status: 408, headers: {'Content-Type': 'text/plain'}});
-	});
+	})());
 });
