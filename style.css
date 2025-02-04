@@ -351,6 +351,7 @@ nav::after {
 #reward-wrapper {
 	margin: var(--default-margin);
 	border-radius: var(--default-border-radius);
+	overflow: hidden;
 }
 #reward-wrapper * {
 	background-color: var(--accent-color-light);
