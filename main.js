@@ -170,10 +170,10 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 	
 	function update_locked_duration_buttons() {
 		for (i in duration_decrease_buttons) {
-			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= (3600 / (60 ** i))) {
-				duration_decrease_buttons[i].classList.add('button-selected');
-			} else {
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) > (3600 / (60 ** i)) || (i != 2 && (selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) == (3600 / (60 ** i)))) {
 				duration_decrease_buttons[i].classList.remove('button-selected');
+			} else {
+				duration_decrease_buttons[i].classList.add('button-selected');
 			}
 		}
 	}
@@ -233,11 +233,13 @@ timer_video.srcObject = timer_canvas.captureStream(30);
 			update_locked_duration_buttons();
 		});
 		decrease_button.addEventListener('click', () => {
-			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) <= factor || scroll_update_mutex) return;
+			if((selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds) < factor || scroll_update_mutex) return;
 			if(selected_work_timer) {
 				work_timer_set_seconds -= factor;
+				work_timer_set_seconds = Math.max(1, work_timer_set_seconds);
 			} else {
 				break_timer_set_seconds -= factor;
+				break_timer_set_seconds = Math.max(1, break_timer_set_seconds);
 			}
 			update_hours_minutes_seconds_display(util_s_to_hmmss(selected_work_timer ? work_timer_set_seconds : break_timer_set_seconds).split(':').reverse());
 			update_locked_duration_buttons();
