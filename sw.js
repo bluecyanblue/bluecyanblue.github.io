@@ -24,12 +24,19 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('fetch', (e) => {
 	e.respondWith((async () => {
-		const networkResource = await fetch(e.request);
+		let req = e.request;
+		if(e.request.headers.has('Range')) {
+			let headers = {};
+			for(let header of req.headers) headers[header[0]] = header[1];
+			delete headers['Range'];
+			req = new Request(req.url, headers);
+		}
+		const networkResource = await fetch(req);
 		if(networkResource) {
-			(await caches.open('v1')).put(e.request, networkResource.clone());
+			if(networkResource.status != 206) (await caches.open('v1')).put(req, networkResource.clone());
 			return networkResource;
 		}
-		const cachedResource = await caches.match(e.request);
+		const cachedResource = await caches.match(req);
 		if(cachedResource) return cachedResource;
 		return new Response('Resource not available', {status: 408, headers: {'Content-Type': 'text/plain'}});
 	})());
