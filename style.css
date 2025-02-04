@@ -3,7 +3,7 @@
 	--default-margin: 0.25rem;
 	--default-border-radius: var(--default-padding);
 	--default-icon-width-and-height: 5vw;
-	--default-mobile-font-size: 3.3vw;
+	--default-font-size: 3.3vw;
 	--accent-color-light: #eee;
 	--accent-color-dim: #888;
 	--accent-color-dark: #222;
@@ -20,7 +20,7 @@ body {
 	margin: 0;
 	font-family: Bahnschrift, "Franklin Gothic", Helvetica, sans-serif;
 	color: var(--accent-color-dark);
-	font-size: var(--default-mobile-font-size);
+	font-size: var(--default-font-size);
 }
 body * {
 	font-family: inherit;
@@ -29,6 +29,7 @@ body * {
 @media (min-aspect-ratio: 4/3) {
 	:root {
 		--default-icon-width-and-height: 20px;
+		--default-font-size: 1rem;
 	}
 	body {
 		display: flex;
@@ -65,8 +66,8 @@ nav > * {
 }
 nav > p::before {
 	display: inline-block;
-	width: var(--default-mobile-font-size);
-	height: var(--default-mobile-font-size);
+	width: var(--default-font-size);
+	height: var(--default-font-size);
 	content: "";
 	mask-image: url("media/install.svg");
 	mask-mode: luminance;
