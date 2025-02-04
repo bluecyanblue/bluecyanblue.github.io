@@ -3,6 +3,7 @@
 	--default-margin: 0.25rem;
 	--default-border-radius: var(--default-padding);
 	--default-icon-width-and-height: 5vw;
+	--default-mobile-font-size: 3.3vw;
 	--accent-color-light: #eee;
 	--accent-color-dim: #888;
 	--accent-color-dark: #222;
@@ -19,7 +20,7 @@ body {
 	margin: 0;
 	font-family: Bahnschrift, "Franklin Gothic", Helvetica, sans-serif;
 	color: var(--accent-color-dark);
-	font-size: 3.3vw;
+	font-size: var(--default-mobile-font-size);
 }
 body * {
 	font-family: inherit;
@@ -58,19 +59,19 @@ nav {
 	margin-bottom: 2rem;
 }
 nav > * {
-	/* padding: 0 var(--default-margin); */
 	border-left: 0.125rem solid var(--accent-color-dim);
 	display: block;
 	margin: 0;
 }
 nav > p::before {
 	display: inline-block;
-	width: var(--default-icon-width-and-height);
-	height: var(--default-icon-width-and-height);
+	width: var(--default-mobile-font-size);
+	height: var(--default-mobile-font-size);
 	content: "";
 	mask-image: url("media/install.svg");
 	mask-mode: luminance;
 	mask-size: cover;
+	margin: var(--default-margin);
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
 }
