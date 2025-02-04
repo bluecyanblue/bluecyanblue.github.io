@@ -54,7 +54,6 @@ function internal_update_timer(timestamp, curr_paused) { // internally pass in p
 	timer_text.textContent = util_s_to_hmmss(Math.ceil(seconds - (timer_ms / 1000)));
 	let timer_text_width = timer_text.getComputedTextLength();
 	let cur_timer_text_chars = timer_text.textContent.length;
-	console.log(timer_text_width);
 	if(timer_text_width > 250 || cur_timer_text_chars != prev_timer_text_chars || timestamp == 0){
 		timer_text.style.fontSize = current_font_size * (250 / timer_text_width);
 		prev_timer_text_chars = cur_timer_text_chars;
