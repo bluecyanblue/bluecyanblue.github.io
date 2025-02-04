@@ -50,12 +50,13 @@ function internal_update_timer(timestamp, curr_paused) { // internally pass in p
 	prev_timestamp = timestamp;
 	let angle = ((timer_ms * 2 * Math.PI / 1000) / seconds) % (2 * Math.PI);
 	timer_circle.setAttribute('d', `M 300 175 A 200 200 0 ${ angle > Math.PI ? 0 : 1} 0 ${300 + 200 * Math.sin(angle)} ${375 - 200 * Math.cos(angle)}`);
-	let current_font_size = parseInt(timer_text.getAttribute('font-size'), 10);
+	let current_font_size = parseInt(getComputedStyle(timer_text).fontSize, 10);
 	timer_text.textContent = util_s_to_hmmss(Math.ceil(seconds - (timer_ms / 1000)));
 	let timer_text_width = timer_text.getComputedTextLength();
 	let cur_timer_text_chars = timer_text.textContent.length;
+	console.log(timer_text_width);
 	if(timer_text_width > 250 || cur_timer_text_chars != prev_timer_text_chars || timestamp == 0){
-		timer_text.setAttribute('font-size', current_font_size * (250 / timer_text_width));
+		timer_text.style.fontSize = current_font_size * (250 / timer_text_width);
 		prev_timer_text_chars = cur_timer_text_chars;
 	}
 	let url = to_canvas_serializer.serializeToString(timer_svg);
