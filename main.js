@@ -554,7 +554,7 @@ document.getElementById('timer-pip-button').addEventListener('click', () => {
 	woof_sound.addEventListener('ended', () => {reward_claim_mutex = false});
 	
 	reward_claim_button.addEventListener('click', () => {
-		if(Math.floor((total_work_time / 1000) / 5) <= rewards_claimed || reward_claim_mutex) return;
+		if(Math.floor((total_work_time / 1000) / 600) <= rewards_claimed || reward_claim_mutex) return;
 		reward_claim_mutex = true;
 		rewards_claimed += 1;
 		if(reward_type_dog_person) {
