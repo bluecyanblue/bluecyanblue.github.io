@@ -31,13 +31,14 @@ self.addEventListener('fetch', (e) => {
 			delete headers['Range'];
 			req = new Request(req.url, headers);
 		}
-		const networkResource = await fetch(req);
-		if(networkResource) {
-			if(networkResource.status != 206) (await caches.open('v1')).put(req, networkResource.clone());
+		try {
+			const networkResource = await fetch(req);
+			(await caches.open('v1')).put(req, networkResource.clone());
 			return networkResource;
+		} catch(err) {
+			const cachedResource = await caches.match(req);
+			if(cachedResource) return cachedResource;
+			return new Response('Resource not available', {status: 408, headers: {'Content-Type': 'text/plain'}});
 		}
-		const cachedResource = await caches.match(req);
-		if(cachedResource) return cachedResource;
-		return new Response('Resource not available', {status: 408, headers: {'Content-Type': 'text/plain'}});
 	})());
 });
