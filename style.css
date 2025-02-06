@@ -133,7 +133,6 @@ nav::after {
 	appearance: none;
 	display: block;
 	width: 100%;
-	height: calc(var(--default-icon-width-and-height) + 2 * var(--default-padding));
 	text-align: center;
 	outline: none;
 	border: none;
