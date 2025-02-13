@@ -89,6 +89,83 @@ nav::after {
 	min-height: 1px;
 	clear: both;
 }
+#tutorial, #white-noise-options, #binaural-options {
+	border-radius: var(--default-border-radius);
+	margin: var(--default-margin);
+	overflow: hidden;
+}
+#tutorial-button::before {
+	display: inline-block;
+	width: var(--default-icon-width-and-height);
+	height: var(--default-icon-width-and-height);
+	content: "";
+	mask-image: url("media/info-icon.svg");
+	mask-mode: luminance;
+	mask-size: cover;
+	margin: var(--default-margin);
+	background-color: var(--accent-color-dark);
+	vertical-align: middle;
+}
+#tutorial:has(#tutorial-button.dropdown-reveal) {
+	position: sticky;
+	top: 0;
+	opacity: 0.8;
+}
+#tutorial:has(#tutorial-button.dropdown-reveal.dropdown-is-hidden) {
+	position: unset;
+	opacity: 1;
+}
+#tutorial-text {
+	margin: var(--default-margin) 0;
+	background-color: var(--accent-color-light);
+	padding: var(--default-padding);
+}
+#tutorial-controls {
+	display: flex;
+	flex-direction: row;
+	gap: var(--default-margin);
+}
+#tutorial-controls * {
+	appearance: none;
+	display: block;
+	text-align: center;
+	outline: none;
+	border: none;
+	padding: 0.25rem 0;
+	border-bottom: var(--default-margin) solid var(--accent-color-dim);
+	background-color: var(--accent-color-light);
+	flex-grow: 1;
+}
+#tutorial-controls > :nth-child(1) {
+	border-bottom-left-radius: var(--default-border-radius);
+}
+#tutorial-controls > :nth-last-child(1) {
+	border-bottom-right-radius: var(--default-border-radius);
+}
+#tutorial-previous-button::after {
+	display: inline-block;
+	width: var(--default-icon-width-and-height);
+	height: var(--default-icon-width-and-height);
+	content: "";
+	mask-image: url("media/triangle-arrow.svg");
+	mask-mode: luminance;
+	mask-size: cover;
+	background-color: var(--accent-color-dark);
+	vertical-align: middle;
+	transform: rotate(-90deg);
+}
+#tutorial-next-button::after {
+	display: inline-block;
+	width: var(--default-icon-width-and-height);
+	height: var(--default-icon-width-and-height);
+	content: "";
+	mask-image: url("media/triangle-arrow.svg");
+	mask-mode: luminance;
+	mask-size: cover;
+	background-color: var(--accent-color-dark);
+	vertical-align: middle;
+	transform: rotate(90deg);
+}
 #timer-work-break-switch {
 	display: flex;
 	flex-direction: row;
@@ -245,11 +322,6 @@ nav::after {
 	mask-size: cover;
 	background-color: var(--accent-color-dark);
 	vertical-align: middle;
-}
-#white-noise-options, #binaural-options {
-	border-radius: var(--default-border-radius);
-	margin: var(--default-margin);
-	overflow: hidden;
 }
 #binaural-options {
 	background-color: var(--accent-color-light);`
