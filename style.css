@@ -95,6 +95,7 @@ nav::after {
 	overflow: hidden;
 }
 #tutorial {
+	z-index: 1;
 	background-color: white;
 }
 #tutorial-button::before {
@@ -112,7 +113,7 @@ nav::after {
 #tutorial:has(#tutorial-button.dropdown-reveal) {
 	position: sticky;
 	top: 0;
-	opacity: 0.8;
+	opacity: 0.9;
 }
 #tutorial:has(#tutorial-button.dropdown-reveal.dropdown-is-hidden) {
 	position: unset;
