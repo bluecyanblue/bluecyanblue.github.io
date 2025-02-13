@@ -94,6 +94,9 @@ nav::after {
 	margin: var(--default-margin);
 	overflow: hidden;
 }
+#tutorial {
+	background-color: white;
+}
 #tutorial-button::before {
 	display: inline-block;
 	width: var(--default-icon-width-and-height);
@@ -150,9 +153,9 @@ nav::after {
 	mask-image: url("media/triangle-arrow.svg");
 	mask-mode: luminance;
 	mask-size: cover;
-	background-color: var(--accent-color-dark);
+	background-color: var(--accent-color-dim);
 	vertical-align: middle;
-	transform: rotate(-90deg);
+	transform: rotate(90deg);
 }
 #tutorial-next-button::after {
 	display: inline-block;
@@ -162,9 +165,9 @@ nav::after {
 	mask-image: url("media/triangle-arrow.svg");
 	mask-mode: luminance;
 	mask-size: cover;
-	background-color: var(--accent-color-dark);
+	background-color: var(--accent-color-dim);
 	vertical-align: middle;
-	transform: rotate(90deg);
+	transform: rotate(-90deg);
 }
 #timer-work-break-switch {
 	display: flex;
