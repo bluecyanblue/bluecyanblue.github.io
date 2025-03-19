@@ -205,10 +205,10 @@ nav::after {
 	background-color: var(--accent-color-light);
 	flex-grow: 1;
 }
-#tutorial-controls > :nth-child(1) {
+#tutorial-controls > button:first-of-type {
 	border-bottom-left-radius: var(--default-border-radius);
 }
-#tutorial-controls > :nth-last-child(1) {
+#tutorial-controls > button:last-of-type {
 	border-bottom-right-radius: var(--default-border-radius);
 }
 #tutorial-previous-button::after {
@@ -257,10 +257,10 @@ nav::after {
 	background-color: var(--accent-color-light);
 	flex-grow: 1;
 }
-#timer-work-break-switch button:nth-child(1) {
+#timer-work-break-switch button:first-of-type {
 	border-bottom-left-radius: var(--default-border-radius);
 }
-#timer-work-break-switch button:nth-last-child(1) {
+#timer-work-break-switch button:last-of-type {
 	border-bottom-right-radius: var(--default-border-radius);
 }
 #timer-work-break-switch .button-selected {
@@ -289,10 +289,10 @@ nav::after {
 	border-bottom: var(--default-margin) solid var(--accent-color-dim);
 	background-color: var(--accent-color-light);
 }
-#timer-duration-controls div:nth-child(1) button:nth-last-child(1) {
+#timer-duration-controls div:first-of-type button:last-of-type {
 	border-bottom-left-radius: var(--default-border-radius);
 }
-#timer-duration-controls div:nth-last-child(1) button:nth-last-child(1) {
+#timer-duration-controls div:last-of-type button:last-of-type {
 	border-bottom-right-radius: var(--default-border-radius);
 }
 #timer-duration-controls * button::after {
@@ -352,7 +352,7 @@ nav::after {
 	mask-mode: luminance;
 	mask-size: cover;
 }
-#timer-play-options > button:nth-child(1) {
+#timer-play-options > button:first-of-type {
 	border-top-left-radius: var(--default-border-radius);
 	border-bottom-left-radius: var(--default-border-radius);
 }
@@ -413,10 +413,10 @@ nav::after {
 	background-color: var(--accent-color-light);
 	flex-grow: 1;
 }
-#white-noise-options-inner > button:nth-child(1) {
+#white-noise-options-inner > button:first-of-type {
 	border-bottom-left-radius: var(--default-border-radius);
 }
-#white-noise-options-inner > button:nth-last-child(1) {
+#white-noise-options-inner > button:last-of-type {
 	border-bottom-right-radius: var(--default-border-radius);
 }
 #white-noise-options-inner .button-selected {
@@ -515,7 +515,7 @@ nav::after {
 	margin: var(--default-margin) 0;
 	border-bottom: var(--default-margin) solid var(--accent-color-dim);
 }
-#reward-wrapper button:nth-last-child(1) {
+#reward-wrapper button:last-of-type {
 	border-bottom-right-radius: var(--default-border-radius);
 	border-bottom-left-radius: var(--default-border-radius);
 }
