@@ -499,15 +499,79 @@ timer_button.addEventListener('click', () => {
 		highlight: null
 	},
 	{
-		text: '-Work on the tutorial is still in progress.-',
+		text: 'The main feature of this app is the pomodoro timer you can find up top (or on the left on Desktop).',
 		highlight: null
 	},
 	{
-		text: '-The tutorial will be completed as soon as possible.-',
+		text: 'The pomodoro technique helps you focus by cutting your work into work periods (usually 25 minutes long) that are followed by small break periods. This timer aims to facilitate that.',
 		highlight: null
 	},
 	{
-		text: '---',
+		text: 'The timer options menu helps you customize the timer durations. The three numbers, from left to right, each correspond to hours, minutes, and seconds, respectively. Try clicking the buttons above and below or scrolling to change the values.',
+		highlight: document.getElementById('timer-options')
+	},
+	{
+		text: 'You can switch between customizing the work timer and customizing the break timer by using the menu above. The longer, dark button corresponds to the currently selected option.',
+		highlight: document.getElementById('timer-work-break-switch')
+	},
+	{
+		text: 'Next are the timer play options. These are for starting/stopping/restarting the timer.',
+		highlight: document.getElementById('timer-play-options')
+	},
+	{
+		text: 'The timer can be unpaused and paused using the long button in the middle.',
+		highlight: document.getElementById('timer-button')
+	},
+	{
+		text: 'The reset button resets the timer for the current block to its full duration. You can use this when you want to prolong your work or break.',
+		highlight: document.getElementById('timer-reset-button')
+	},
+	{
+		text: 'The skip button skips to the next block. Note than when the timer transitions to the next block, the timer durations are automatically updated to the ones in the timer options, so if you want to change the durations, you can use the skip button to update the timer.',
+		highlight: document.getElementById('timer-skip-button')
+	},
+	{
+		text: 'The picture-in-picture button opens a little pop-up window of the timer with its own interface analagous to this one. This allows you to have the timer on screen when the app is closed. Note that you need to have this pop-up for the timer to work in the background if you are on mobile.',
+		highlight: document.getElementById('timer-pip-button')
+	},
+	{
+		text: 'Next are the noise options. Some people find that listening to random noise helps them concentrate. The noise options allow you to choose between 3 different options of noise to play.',
+		highlight: document.getElementById('white-noise-options')
+	},
+	{
+		text: 'White noise is a little \'harsh\' while pink and brown noise are somewhat \'smoother\'. Try selecting each to see which one you like the most.',
+		highlight: document.getElementById('white-noise-options')
+	},
+	{
+		text: 'Next are the binaural beats options. This is another type of noise that helps some people concentrate. It consists of two slightly differing pure frequencies playing in your left and right ear, creating a kind of middle tone. The binaural beats options let you customize the sound that plays.',
+		highlight: document.getElementById('binaural-options')
+	},
+	{
+		text: 'The two sliders control the base frequency (the pitch) and the difference in the two frequencies in your two ears (you may think of it as the \'wobbliness\') of the binaural beats. The sound updates automatically as you change the sliders. Try playing around to see what you like.',
+		highlight: document.getElementById('binaural-options')
+	},
+	{
+		text: 'You can use the mute button to get rid of the noise.',
+		highlight: document.getElementById('mute-button')
+	},
+	{
+		text: 'For every 10 minutes that the work timer has been on, you will get little rewards in the forms of \'meow\'s and \'woof\'s.',
+		highlight: document.getElementById('reward-wrapper')
+	},
+	{
+		text: 'You can claim the rewards using the corresponding button.',
+		highlight: document.getElementById('reward-claim-button')
+	},
+	{
+		text: 'You can switch between the two different kinds of rewards using the button below.',
+		highlight: document.getElementById('reward-type-switch-button')
+	},
+	{
+		text: 'Finally, if you are finding TickTock\'s grey look too boring, you can change the colors in the pallete menu.',
+		highlight: document.getElementById('pallete-change-menu-button')
+	},
+	{
+		text: 'And with that, you now (hopefully) know how to use TickTock! Thank you again for showing interest in TickTock.',
 		highlight: null
 	},
 	];
