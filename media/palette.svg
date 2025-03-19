@@ -1,0 +1,8 @@
+<svg version="1.1" width="20" height="20" xmlns="http://www.w3.org/2000/svg">
+	<rect width="20" height="20" fill="black"/>
+	<path d="M 20 10 A 10 10 0 1 0 10 20 A 2.61203874964 2.61203874964 0 0 0 11.8469903126 15.5409709378 A 2.61203874964 2.61203874964 0 0 1 15.5409709378 11.8469903126 A 2.61203874964 2.61203874964 0 0 0 20 10 Z" fill="white"/>
+	<circle cx="4.80384757732" cy="7" r="2" fill="black"/>
+	<circle cx="10" cy="4" r="2" fill="black"/>
+	<circle cx="15.19615242268" cy="7" r="2" fill="black"/>
+	<circle cx="4.80384757732" cy="13" r="2" fill="black"/>
+</svg>

@@ -9,18 +9,31 @@
 		<link rel="manifest" href="manifest.json"/>
 	</head>
 	<body>
-		<nav><h1>⌛ TickTock</h1><p>Installable</p><a href="https://forms.gle/8sEqruahR8zN1kaM7">Give feedback</a></nav>
+		<nav><h1>⌛ TickTock</h1><p>Installable</p><button id="pallete-change-menu-button"></button></nav>
+		<div id="pallete-change-menu" class="pallete-change-menu-hidden">
+			<div><input id="pallete-color-background-input" type="color"/></div>
+			<div><input id="pallete-accent-color-light-input" type="color"/></div>
+			<div><input id="pallete-accent-color-dim-input" type="color"/></div>
+			<div><input id="pallete-accent-color-dark-input" type="color"/></div>
+			<div><input id="pallete-alt-accent-color-light-input" type="color"/></div>
+			<div><input id="pallete-alt-accent-color-dim-input" type="color"/></div>
+			<div><input id="pallete-alt-accent-color-dark-input" type="color"/></div>
+		</div>
 		<div id="content-wrapper">
 			<div id="timer-wrapper">
 				<svg id="timer-svg" version="1.1" width="600" height="675" xmlns="http://www.w3.org/2000/svg">
 					<style>
-						:root {
-							--accent-color-light: #eee;
-							--accent-color-dim: #888;
-							--accent-color-dark: #222;
-							--alt-accent-color-light: #ccb;
-							--alt-accent-color-dim: #bba;
-							--alt-accent-color-dark: #aa8;
+						svg {
+							--color-background: #FFFFFF;
+							--accent-color-light: #EEEEEE;
+							--accent-color-dim: #888888;
+							--accent-color-dark: #222222;
+							--alt-accent-color-light: #CCCCBB;
+							--alt-accent-color-dim: #BBBBAA;
+							--alt-accent-color-dark: #AAAA88;
+						}
+						.timer-bg {
+							fill: var(--color-background);
 						}
 						.timer-outer {
 							fill: var(--accent-color-dark);
@@ -40,7 +53,7 @@
 						}
 					</style>
 					<g id="in-svg-timer-wrapper">
-						<rect class="timer-bg" width="100%" height="100%" fill="white" />
+						<rect class="timer-bg" width="100%" height="100%"/>
 						<circle class="timer-outer" cx="300" cy="375" r="250"/>
 						<circle class="timer-inner" cx="300" cy="375" r="200"/>
 						<rect class="timer-outer" x="275" y="75" width="50" height="75"/>
@@ -53,9 +66,9 @@
 			<div id="side-wrapper">
 				<div id="tutorial">
 					<button id="tutorial-button" class="dropdown-reveal dropdown-is-hidden">Tutorial</button>
-					<p id="tutorial-text">(...Coming soon!)</p>
+					<p id="tutorial-text-display"></p>
 					<div id="tutorial-controls">
-						<button id="tutorial-previous-button"></button>
+						<button id="tutorial-previous-button" class="button-selected"></button>
 						<button id="tutorial-next-button"></button>
 					</div>
 				</div>

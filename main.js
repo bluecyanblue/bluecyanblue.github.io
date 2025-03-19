@@ -492,6 +492,68 @@ timer_button.addEventListener('click', () => {
 	});
 }, {once: true});
 
+{
+	const tutorial_data = [
+	{
+		text: 'Thank you for showing interest in TickTock! This is a tutorial to help you understand the controls. You can use the buttons below to navigate this guide.',
+		highlight: null
+	},
+	{
+		text: '-Work on the tutorial is still in progress.-',
+		highlight: null
+	},
+	{
+		text: '-The tutorial will be completed as soon as possible.-',
+		highlight: null
+	},
+	{
+		text: '---',
+		highlight: null
+	},
+	];
+	let tutorial_cursor = 0;
+	const tutorial_text_display = document.getElementById('tutorial-text-display');
+	const tutorial_previous_button = document.getElementById('tutorial-previous-button');
+	const tutorial_next_button = document.getElementById('tutorial-next-button');
+	const tutorial_highlight = document.createElement('div');
+	tutorial_highlight.id = 'highlight';
+	const highlight_element_observer = new ResizeObserver((entries) => {
+		entries[0].target.classList.add('highlight');
+		tutorial_highlight.style.borderRadius = getComputedStyle(entries[0].target).getPropertyValue('border-radius');
+		tutorial_highlight.style.width = `${entries[0].borderBoxSize[0].inlineSize}px`;
+		tutorial_highlight.style.height = `${entries[0].borderBoxSize[0].blockSize}px`;
+		entries[0].target.prepend(tutorial_highlight);
+	});
+	tutorial_previous_button.addEventListener('click', () => {
+		if(!tutorial_cursor) return;
+		if(tutorial_data[tutorial_cursor].highlight) {
+			tutorial_data[tutorial_cursor].highlight.classList.remove('highlight');
+			tutorial_data[tutorial_cursor].highlight.removeChild(tutorial_highlight)
+			highlight_element_observer.disconnect();
+		};
+		tutorial_cursor -= 1;
+		tutorial_text_display.textContent = tutorial_data[tutorial_cursor].text;
+		if(tutorial_data[tutorial_cursor].highlight) highlight_element_observer.observe(tutorial_data[tutorial_cursor].highlight);
+		tutorial_next_button.classList.remove('button-selected');
+		if(!tutorial_cursor) tutorial_previous_button.classList.add('button-selected');
+	});
+	tutorial_next_button.addEventListener('click', () => {
+		if(tutorial_cursor == tutorial_data.length - 1) return;
+		if(tutorial_data[tutorial_cursor].highlight) {
+			tutorial_data[tutorial_cursor].highlight.classList.remove('highlight');
+			tutorial_data[tutorial_cursor].highlight.removeChild(tutorial_highlight);
+			highlight_element_observer.disconnect();
+		};
+		tutorial_cursor += 1;
+		tutorial_text_display.textContent = tutorial_data[tutorial_cursor].text;
+		if(tutorial_data[tutorial_cursor].highlight) highlight_element_observer.observe(tutorial_data[tutorial_cursor].highlight);
+		tutorial_previous_button.classList.remove('button-selected');
+		if(tutorial_cursor == tutorial_data.length - 1) tutorial_next_button.classList.add('button-selected');
+	});
+	tutorial_text_display.textContent = tutorial_data[tutorial_cursor].text;
+	
+}
+
 document.getElementById('timer-pip-button').addEventListener('click', () => {
 	set_up_picture_in_picture().catch((err) => {
 		let error_message;
@@ -510,11 +572,38 @@ document.getElementById('timer-pip-button').addEventListener('click', () => {
 				break;
 			default:
 				error_message = 'Unknown error';
-				break;
 		}
 		alert('Couldn\'t set up Picture-in-Picture mode: ' + error_message);
 	});
 });
+{
+	const pallete_change_menu = document.getElementById('pallete-change-menu');
+	pallete_change_menu.style.top = `${document.querySelector('nav').getBoundingClientRect().height}px`;
+	document.addEventListener('scroll', () => {
+		pallete_change_menu.style.top = `${Math.max(0, document.querySelector('nav').getBoundingClientRect().height - window.scrollY)}px`;
+	});
+	const color_background_input = document.getElementById('pallete-color-background-input');
+	const accent_color_light_input = document.getElementById('pallete-accent-color-light-input');
+	const accent_color_dim_input = document.getElementById('pallete-accent-color-dim-input');
+	const accent_color_dark_input = document.getElementById('pallete-accent-color-dark-input');
+	const alt_accent_color_light_input = document.getElementById('pallete-alt-accent-color-light-input');
+	const alt_accent_color_dim_input = document.getElementById('pallete-alt-accent-color-dim-input');
+	const alt_accent_color_dark_input = document.getElementById('pallete-alt-accent-color-dark-input');
+	const color_inputs = [{element: color_background_input, variable: '--color-background'}, {element: accent_color_light_input, variable: '--accent-color-light'}, {element: accent_color_dim_input, variable: '--accent-color-dim'}, {element: accent_color_dark_input, variable: '--accent-color-dark'}, {element: alt_accent_color_light_input, variable: '--alt-accent-color-light'}, {element: alt_accent_color_dim_input, variable: '--alt-accent-color-dim'}, {element: alt_accent_color_dark_input, variable: '--alt-accent-color-dark'}];
+	const root = document.querySelector('html');
+	const root_style = getComputedStyle(root);
+	const svg_style = getComputedStyle(timer_svg);
+	for(let input of color_inputs) {
+		console.log(input.variable, root_style.getPropertyValue(input.variable), 'a');
+		input.element.value = root_style.getPropertyValue(input.variable);
+		console.log(input.variable, root_style.getPropertyValue(input.variable));
+		input.element.addEventListener('change', function () {
+			timer_svg.style.setProperty(input.variable, input.element.value);
+			root.style.setProperty(input.variable, input.element.value);
+		});
+	}
+	document.getElementById('pallete-change-menu-button').addEventListener('click', () => pallete_change_menu.classList.toggle('pallete-change-menu-hidden'));
+}
 
 {
 	const dropdowns = document.getElementsByClassName('dropdown-reveal');
