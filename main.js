@@ -646,14 +646,7 @@ document.getElementById('timer-pip-button').addEventListener('click', () => {
 	document.addEventListener('scroll', () => {
 		pallete_change_menu.style.top = `${Math.max(0, document.querySelector('nav').getBoundingClientRect().height - window.scrollY)}px`;
 	});
-	const color_background_input = document.getElementById('pallete-color-background-input');
-	const accent_color_light_input = document.getElementById('pallete-accent-color-light-input');
-	const accent_color_dim_input = document.getElementById('pallete-accent-color-dim-input');
-	const accent_color_dark_input = document.getElementById('pallete-accent-color-dark-input');
-	const alt_accent_color_light_input = document.getElementById('pallete-alt-accent-color-light-input');
-	const alt_accent_color_dim_input = document.getElementById('pallete-alt-accent-color-dim-input');
-	const alt_accent_color_dark_input = document.getElementById('pallete-alt-accent-color-dark-input');
-	const color_inputs = [{element: color_background_input, variable: '--color-background'}, {element: accent_color_light_input, variable: '--accent-color-light'}, {element: accent_color_dim_input, variable: '--accent-color-dim'}, {element: accent_color_dark_input, variable: '--accent-color-dark'}, {element: alt_accent_color_light_input, variable: '--alt-accent-color-light'}, {element: alt_accent_color_dim_input, variable: '--alt-accent-color-dim'}, {element: alt_accent_color_dark_input, variable: '--alt-accent-color-dark'}];
+	const color_inputs = [{element: document.getElementById('pallete-color-background-input'), variable: '--color-background'}, {element: document.getElementById('pallete-accent-color-light-input'), variable: '--accent-color-light'}, {element: document.getElementById('pallete-accent-color-dim-input'), variable: '--accent-color-dim'}, {element: document.getElementById('pallete-accent-color-dark-input'), variable: '--accent-color-dark'}, {element: document.getElementById('pallete-alt-accent-color-light-input'), variable: '--alt-accent-color-light'}, {element: document.getElementById('pallete-alt-accent-color-dim-input'), variable: '--alt-accent-color-dim'}, {element: document.getElementById('pallete-alt-accent-color-dark-input'), variable: '--alt-accent-color-dark'}];
 	const root = document.querySelector('html');
 	const root_style = getComputedStyle(root);
 	const svg_style = getComputedStyle(timer_svg);
