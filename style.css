@@ -235,6 +235,9 @@ nav::after {
 	vertical-align: middle;
 	transform: rotate(-90deg);
 }
+#timer-options {
+	border-radius: var(--default-border-radius);
+}
 #timer-work-break-switch {
 	display: flex;
 	flex-direction: row;
@@ -318,6 +321,7 @@ nav::after {
 	flex-direction: row;
 	gap: var(--default-margin);
 	margin: var(--default-margin);
+	border-radius: var(--default-border-radius);
 }
 #timer-play-options > * {
 	appearance: none;
