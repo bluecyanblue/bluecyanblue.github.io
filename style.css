@@ -160,7 +160,7 @@ nav::after {
 	overflow: hidden;
 }
 #tutorial {
-	z-index: 1;
+	z-index: 2;
 	background-color: white;
 }
 #tutorial-button::before {
@@ -544,7 +544,7 @@ nav::after {
 	position: absolute;
 	top: 0;
 	left: 0;
-	z-index: 2;
+	z-index: 1;
 	box-shadow: inset 0px 0px 0px var(--default-margin) var(--alt-accent-color-light);
 	pointer-events: none;
 }
